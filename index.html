@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#071a3f">
+<title>Beko · Blue Days — La roue des goodies</title>
+<style>
+  :root{
+    --felt:#0f2a5e; --felt-deep:#071a3f;
+    --brass:#c8a24a; --brass-bright:#e8cd82; --brass-deep:#8a6c26;
+    --bone:#f4efe2; --ink:#0a1730;
+    --ok:#2fbf7f; --bad:#ff8a8a;
+    --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;background:var(--felt-deep);}
+  body{min-height:100dvh;overflow:hidden;color:var(--bone);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-tap-highlight-color:transparent;overscroll-behavior:none;}
+
+  #backdrop{position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% 0%,  rgba(200,162,74,.14), transparent 62%),
+      radial-gradient(ellipse 90% 70% at 50% 105%, rgba(20,48,110,.75), transparent 70%),
+      linear-gradient(180deg,#0a2050 0%, #071a3f 55%, #050f28 100%);}
+  #backdrop::after{content:'';position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size:22px 22px;opacity:.5;}
+
+  .brand{position:fixed;top:calc(16px + var(--safe-t));left:20px;z-index:6;line-height:1;pointer-events:none;}
+  .brand .bk{font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:24px;letter-spacing:-1px;color:var(--brass-bright);}
+  .brand .bk::after{content:"";display:block;width:48px;height:4px;border-radius:3px;background:var(--brass);margin-top:2px;}
+  .brand .days{margin-top:6px;font-size:9px;letter-spacing:.34em;font-weight:700;text-transform:uppercase;color:rgba(232,205,130,.7);}
+
+  .topbtn{position:fixed;top:calc(16px + var(--safe-t));z-index:7;height:36px;padding:0 14px;border-radius:999px;
+    border:1px solid rgba(200,162,74,.4);background:rgba(10,23,48,.55);color:var(--brass-bright);
+    font-size:12px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:6px;backdrop-filter:blur(4px);}
+  .topbtn.show{display:inline-flex;}
+  #mute{right:16px;width:36px;padding:0;justify-content:center;}
+  #logout{right:60px;}
+  .topbtn:focus-visible{outline:2px solid var(--brass-bright);outline-offset:2px;}
+
+  .screen{position:fixed;inset:0;z-index:2;display:none;flex-direction:column;align-items:center;
+    justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:calc(72px + var(--safe-t)) 16px calc(28px + var(--safe-b));}
+  .screen.on{display:flex;}
+  .screen.center{justify-content:center;}
+
+  .card{width:min(94vw,420px);margin:auto;text-align:center;
+    background:linear-gradient(180deg,#123063,#0b1f45);
+    border:1px solid rgba(200,162,74,.42);border-radius:22px;
+    padding:30px 26px 28px;box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);}
+  .eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass);font-weight:700;}
+  .card h1{font-family:Georgia,"Times New Roman",serif;font-size:26px;font-weight:700;color:var(--bone);margin:8px 0 4px;}
+  .card p.lead{font-size:13px;color:rgba(244,239,226,.72);margin-bottom:18px;}
+
+  .field{margin-bottom:14px;text-align:left;}
+  .field label{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);font-weight:700;margin-bottom:6px;}
+  .field input,.field select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(200,162,74,.35);
+    background:rgba(7,20,44,.72);color:var(--bone);font-size:15px;font-family:inherit;appearance:none;}
+  .field select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23c8a24a' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:34px;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--brass-bright);box-shadow:0 0 0 3px rgba(200,162,74,.18);}
+  .field input::placeholder{color:rgba(244,239,226,.4);}
+  .field select:disabled{opacity:.5;}
+  select option{color:#0a1730;background:#fff;}
+
+  .seg{display:flex;gap:10px;}
+  .seg button{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(200,162,74,.35);
+    background:rgba(7,20,44,.72);color:var(--bone);font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;transition:.15s;}
+  .seg button.active{background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink);border-color:transparent;}
+
+  .notice{min-height:18px;font-size:13px;margin:6px 0 2px;font-weight:600;}
+  .notice.err{color:var(--bad);} .notice.ok{color:var(--ok);}
+
+  .btn{font-family:Georgia,serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--ink);cursor:pointer;
+    border:none;border-radius:999px;padding:14px 30px;width:100%;margin-top:6px;
+    background:linear-gradient(180deg,var(--brass-bright),var(--brass) 55%,var(--brass-deep));
+    box-shadow:0 6px 18px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.45);transition:transform .12s ease, filter .12s ease;}
+  .btn:active{transform:translateY(2px);}
+  .btn:disabled{filter:grayscale(.4) brightness(.8);cursor:default;}
+  .btn:focus-visible{outline:2px solid var(--brass-bright);outline-offset:3px;}
+  .btn.slim{width:auto;min-width:210px;}
+
+  .badge{position:fixed;bottom:calc(6px + var(--safe-b));z-index:30;font-size:10.5px;letter-spacing:.1em;
+    border-radius:999px;padding:4px 12px;display:none;}
+  .badge.show{display:block;}
+  #demo-badge{left:50%;transform:translateX(-50%);text-transform:uppercase;color:#ffcf8a;
+    background:rgba(120,60,0,.5);border:1px solid rgba(255,180,90,.4);}
+  #sync-badge{left:14px;color:#cfe3ff;background:rgba(20,48,110,.6);border:1px solid rgba(90,160,220,.4);}
+
+  #screen-game{justify-content:center;}
+  .player-tag{font-size:12px;letter-spacing:.06em;color:rgba(244,239,226,.8);margin-bottom:4px;}
+  .player-tag b{color:var(--brass-bright);}
+  .g-eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass);font-weight:700;margin-bottom:4px;text-align:center;}
+  .g-title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(19px,5vw,28px);font-weight:700;color:var(--bone);text-align:center;margin-bottom:12px;}
+
+  .wheel-wrap{position:relative;width:min(90vw,min(56vh,470px));aspect-ratio:1;}
+  .pointer{position:absolute;left:50%;top:-3px;transform:translateX(-50%);z-index:4;width:40px;height:48px;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));transform-origin:50% 14%;}
+  .pointer.tick{animation:tick .09s ease-out;}
+  @keyframes tick{0%{transform:translateX(-50%) rotate(0);}45%{transform:translateX(-50%) rotate(-13deg);}100%{transform:translateX(-50%) rotate(0);}}
+  .wheel-svg{width:100%;height:100%;display:block;}
+  #rotor{transform-origin:300px 300px;}
+  .rotor-spin{transition:transform var(--spin-ms,5600ms) cubic-bezier(.13,.78,.22,1);}
+  .bulb{fill:var(--brass-bright);opacity:.35;}
+  .bulbs-live .bulb{animation:bulb 1s steps(1,end) infinite;}
+  .bulbs-live .bulb:nth-child(odd){animation-delay:.5s;}
+  @keyframes bulb{0%,49%{opacity:1;}50%,100%{opacity:.26;}}
+  .seg-label{font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:800;fill:var(--bone);letter-spacing:.5px;}
+  .hub-word{font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:800;fill:var(--brass-bright);letter-spacing:-1px;}
+  .hub-sub{font-family:"Inter",sans-serif;font-size:8.5px;font-weight:700;fill:rgba(232,205,130,.66);letter-spacing:.28em;}
+  .caption{margin-top:14px;text-align:center;max-width:440px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);opacity:.82;font-weight:600;min-height:16px;}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:flex;justify-content:center;gap:12px;
+    padding:14px 16px calc(16px + var(--safe-b));background:linear-gradient(0deg, rgba(5,15,40,.9), transparent);}
+
+  .result{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(ellipse 90% 60% at 50% 40%, rgba(200,162,74,.18), transparent 66%), rgba(4,11,28,.72);
+    backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s ease;}
+  .result.show{opacity:1;pointer-events:auto;}
+  .prize{width:min(90vw,380px);text-align:center;}
+  .prize .won{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass);font-weight:700;margin-bottom:6px;}
+  .gift-stage{position:relative;width:100%;height:240px;display:flex;align-items:flex-end;justify-content:center;margin:2px 0;}
+  .gift{position:relative;width:120px;height:160px;border:0;background:none;padding:0;
+    filter:drop-shadow(0 14px 22px rgba(0,0,0,.5));animation:giftBob 2.8s ease-in-out infinite;}
+  .gift.opening{animation:none;}
+  @keyframes giftBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .giftsvg{width:100%;height:100%;overflow:visible;display:block;}
+  .lid-grp{transform-box:fill-box;transform-origin:50% 92%;transition:transform .62s cubic-bezier(.3,.7,.25,1.4),opacity .55s;}
+  .glow-grp,.rays-grp,.light{opacity:0;transition:opacity .5s;}
+  .rays-grp{transform-box:fill-box;transform-origin:center;animation:raysSpin 10s linear infinite;}
+  @keyframes raysSpin{to{transform:rotate(360deg);}}
+  .gloss-sweep{transform-box:fill-box;animation:glossSweep 3.8s ease-in-out infinite;}
+  @keyframes glossSweep{0%,100%{transform:translateX(-46px);}50%{transform:translateX(46px);}}
+  .gift.opening .lid-grp{transform:translateY(-92px) rotate(-13deg);opacity:0;}
+  .gift.opening .glow-grp{opacity:1;animation:glowPulse 1.5s ease-out;}
+  .gift.opening .rays-grp{opacity:.9;}
+  .gift.opening .light{opacity:1;}
+  .gift.opening .gloss-sweep{display:none;}
+  @keyframes glowPulse{0%{opacity:0;}30%{opacity:1;}100%{opacity:.8;}}
+  .spark{position:absolute;left:50%;top:58%;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:7;
+    background:radial-gradient(circle,#fff,var(--brass-bright) 60%);box-shadow:0 0 9px rgba(232,205,130,.95);opacity:0;
+    animation:sparkFly .8s ease-out forwards;}
+  @keyframes sparkFly{0%{opacity:1;transform:translate(-50%,-50%) scale(.35);}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1);}}
+  .goodie-pop{position:absolute;left:50%;top:58%;width:150px;height:150px;z-index:9;pointer-events:none;
+    transform:translate(-50%,-50%) scale(.2);opacity:0;
+    filter:drop-shadow(0 0 13px rgba(255,255,255,.92)) drop-shadow(0 0 28px rgba(232,205,130,.55));}
+  .goodie-pop svg{width:100%;height:100%;display:block;}
+  .goodie-pop::before{content:'';position:absolute;left:50%;top:50%;width:134px;height:134px;transform:translate(-50%,-50%);z-index:-1;
+    border-radius:50%;background:radial-gradient(circle,rgba(232,205,130,.5),transparent 68%);animation:haloPulse 2.4s ease-in-out infinite;}
+  @keyframes haloPulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1);}50%{opacity:.95;transform:translate(-50%,-50%) scale(1.2);}}
+  .goodie-pop.go{animation:popRise 1s cubic-bezier(.2,.85,.3,1.25) forwards;}
+  @keyframes popRise{0%{transform:translate(-50%,-50%) scale(.2);opacity:0;}25%{opacity:1;}
+    100%{transform:translate(-50%,calc(-50% - 84px)) scale(1);opacity:1;}}
+  .goodie-pop.float{animation:popBob 2.8s ease-in-out infinite;opacity:1;}
+  @keyframes popBob{0%,100%{transform:translate(-50%,calc(-50% - 84px)) scale(1) rotate(-4deg);}
+    50%{transform:translate(-50%,calc(-50% - 94px)) scale(1.05) rotate(4deg);}}
+  .prize .name,.prize .sub,.prize .again{opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s;}
+  .prize.revealed .name{opacity:1;transform:none;}
+  .prize.revealed .sub{opacity:1;transform:none;transition-delay:.08s;}
+  .prize.revealed .again{opacity:1;transform:none;transition-delay:.16s;}
+  .prize .name{font-family:Georgia,serif;font-size:27px;font-weight:700;color:var(--bone);margin-top:4px;}
+  .prize .sub{font-size:13px;color:rgba(244,239,226,.72);margin-top:6px;}
+  .prize .again{margin-top:22px;}
+
+  #confetti{position:fixed;inset:0;z-index:19;pointer-events:none;}
+
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(10,23,48,.4);border-top-color:var(--ink);
+    border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  @media (prefers-reduced-motion: reduce){
+    .rotor-spin{transition-duration:.01ms !important;}
+    .pointer.tick{animation:none;}
+    .gift,.rays-grp,.gloss-sweep{animation:none;}
+    .gift.opening .glow-grp{animation:none;opacity:.8;} .spark{display:none;}
+    .goodie-pop::before,.goodie-pop.float{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div id="backdrop"></div>
+<div class="brand"><div class="bk">beko</div><div class="days">Blue Days</div></div>
+<button class="topbtn" id="logout">Déconnexion</button>
+<button class="topbtn" id="mute" aria-label="Couper le son">♪</button>
+
+<!-- ============ LOGIN ============ -->
+<section class="screen center on" id="screen-login">
+  <div class="card">
+    <div class="eyebrow">La roue des goodies</div>
+    <h1>Connexion</h1>
+    <p class="lead">Espace animateur — réservé au personnel Beko.</p>
+    <div class="field"><label for="u">Identifiant</label><input id="u" autocomplete="username" placeholder="Admin"></div>
+    <div class="field"><label for="p">Mot de passe</label><input id="p" type="password" autocomplete="current-password" placeholder="••••"></div>
+    <div class="notice" id="login-msg"></div>
+    <button class="btn" id="btn-login">Se connecter</button>
+  </div>
+</section>
+
+<!-- ============ PLAYER FORM ============ -->
+<section class="screen" id="screen-form">
+  <div class="card">
+    <div class="eyebrow">Nouveau joueur</div>
+    <h1>Informations</h1>
+    <p class="lead">Renseignez le participant avant de lancer la roue.</p>
+    <div class="field"><label for="f-prenom">Prénom</label><input id="f-prenom" placeholder="Prénom"></div>
+    <div class="field"><label for="f-nom">Nom</label><input id="f-nom" placeholder="Nom de famille"></div>
+    <div class="field"><label for="f-tel">Téléphone</label>
+      <input id="f-tel" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="15" placeholder="8 chiffres tunisiens — ex. 22 123 456"></div>
+    <div class="field"><label for="f-gov">Gouvernorat</label>
+      <select id="f-gov"><option value="">— Choisir —</option></select></div>
+    <div class="field"><label for="f-del">Délégation</label>
+      <select id="f-del" disabled><option value="">— Choisir d'abord le gouvernorat —</option></select></div>
+    <div class="field"><label>A acheté un produit Beko aujourd'hui&nbsp;?</label>
+      <div class="seg" id="f-achat">
+        <button type="button" data-v="Oui">Oui</button>
+        <button type="button" data-v="Non">Non</button>
+      </div></div>
+    <div class="notice" id="form-msg"></div>
+    <button class="btn" id="btn-start">Passer à la roue</button>
+  </div>
+</section>
+
+<!-- ============ GAME ============ -->
+<section class="screen" id="screen-game">
+  <div class="player-tag" id="player-tag"></div>
+  <div class="g-eyebrow">La roue des goodies</div>
+  <div class="g-title">Tournez &amp; gagnez votre goodie</div>
+
+  <div class="wheel-wrap">
+    <svg class="pointer" id="pointer" viewBox="0 0 40 48" aria-hidden="true">
+      <defs><linearGradient id="ptrG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f2dda0"/><stop offset=".5" stop-color="#c8a24a"/><stop offset="1" stop-color="#8a6c26"/>
+      </linearGradient></defs>
+      <circle cx="20" cy="10" r="9" fill="url(#ptrG)" stroke="#5d4715" stroke-width="1.3"/>
+      <path d="M20 46 L9 15 A9 9 0 0 0 31 15 Z" fill="url(#ptrG)" stroke="#5d4715" stroke-width="1.3" stroke-linejoin="round"/>
+      <circle cx="20" cy="10" r="3.2" fill="#4a3812"/>
+    </svg>
+    <svg class="wheel-svg" id="wheel" viewBox="0 0 600 600" role="img" aria-label="Roue des goodies Beko Blue Days">
+      <defs>
+        <radialGradient id="rimG" cx="50%" cy="34%" r="66%">
+          <stop offset="0" stop-color="#f2dda0"/><stop offset=".48" stop-color="#c8a24a"/><stop offset="1" stop-color="#6f5518"/></radialGradient>
+        <radialGradient id="hubG" cx="50%" cy="32%" r="72%">
+          <stop offset="0" stop-color="#1c3f86"/><stop offset="1" stop-color="#070f24"/></radialGradient>
+        <radialGradient id="glowG" cx="50%" cy="50%" r="50%">
+          <stop offset=".62" stop-color="rgba(0,0,0,0)"/><stop offset="1" stop-color="rgba(0,0,0,.42)"/></radialGradient>
+        <filter id="glowW" x="-60%" y="-60%" width="220%" height="220%">
+          <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ffffff" flood-opacity="0.9"/>
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#04102a" flood-opacity="0.35"/></filter>
+        <symbol id="ic-tote" viewBox="0 0 120 120" overflow="visible">
+  <!-- handles -->
+  <path d="M40 40 C40 14, 80 14, 80 40" fill="none" stroke="#f5f0e3" stroke-width="7" stroke-linecap="round"/>
+  <path d="M40 40 C40 18, 80 18, 80 40" fill="none" stroke="#b7c2cf" stroke-width="2.4" stroke-linecap="round" opacity="0.5"/>
+  <!-- body -->
+  <path d="M26 38 L94 38 L90 104 Q89 110 83 110 L37 110 Q31 110 30 104 Z" fill="#f5f0e3" stroke="#0e2a52" stroke-width="2.4" stroke-linejoin="round"/>
+  <!-- side shade -->
+  <path d="M60 38 L60 110 L83 110 Q89 110 90 104 L94 38 Z" fill="#000000" opacity="0.06"/>
+  <!-- top opening line -->
+  <path d="M26 38 L94 38" stroke="#0e2a52" stroke-width="2.4"/>
+  <path d="M31 46 L89 46" stroke="#b7c2cf" stroke-width="1.6" opacity="0.55"/>
+  <!-- handle attach stitches -->
+  <circle cx="40" cy="41" r="2.2" fill="#0e2a52"/>
+  <circle cx="80" cy="41" r="2.2" fill="#0e2a52"/>
+  <text x="60" y="78.3928" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="12.9" fill="#1a6ec0" letter-spacing="-0.5">beko</text><rect x="44.0" y="82.4" width="32.0" height="2.2" rx="1.1" fill="#1a6ec0"/>
+</symbol>
+        <symbol id="ic-cap" viewBox="0 0 120 120" overflow="visible">
+  <!-- crown -->
+  <path d="M26 70 Q26 30 60 30 Q94 30 94 70 Q60 60 26 70 Z" fill="#f5f0e3" stroke="#0e2a52" stroke-width="2.4" stroke-linejoin="round"/>
+  <!-- panel seams -->
+  <path d="M60 30 L60 62" stroke="#b7c2cf" stroke-width="1.6" opacity="0.6"/>
+  <path d="M43 33 Q47 50 45 65" stroke="#b7c2cf" stroke-width="1.4" opacity="0.5" fill="none"/>
+  <path d="M77 33 Q73 50 75 65" stroke="#b7c2cf" stroke-width="1.4" opacity="0.5" fill="none"/>
+  <!-- top button -->
+  <circle cx="60" cy="31" r="4" fill="#1a6ec0" stroke="#0e2a52" stroke-width="1.6"/>
+  <!-- eyelets -->
+  <circle cx="52" cy="45" r="1.6" fill="#0e2a52"/>
+  <circle cx="68" cy="45" r="1.6" fill="#0e2a52"/>
+  <!-- brim -->
+  <path d="M24 70 Q60 60 96 70 Q112 74 104 84 Q60 78 30 84 Q18 80 24 70 Z" fill="#1a6ec0" stroke="#0e2a52" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M30 78 Q60 72 100 79" fill="none" stroke="#e8cd82" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.8"/>
+  <path d="M60 60 Q60 68 66 78 Q40 74 30 84" fill="#000000" opacity="0.08"/>
+  <text x="58" y="55.73388" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="11.0" fill="#1a6ec0" letter-spacing="-0.5">beko</text><rect x="44.4" y="59.2" width="27.2" height="1.8" rx="0.9" fill="#1a6ec0"/>
+</symbol>
+        <symbol id="ic-cardholder" viewBox="0 0 120 120" overflow="visible">
+  <!-- peeking card -->
+  <rect x="40" y="30" width="44" height="30" rx="4" fill="#ffffff" stroke="#0e2a52" stroke-width="2"/>
+  <rect x="44" y="35" width="20" height="5" rx="2.5" fill="#c8a24a"/>
+  <rect x="44" y="44" width="34" height="3" rx="1.5" fill="#b7c2cf"/>
+  <rect x="44" y="50" width="26" height="3" rx="1.5" fill="#b7c2cf"/>
+  <!-- holder body -->
+  <path d="M24 48 L96 48 Q100 48 100 52 L100 96 Q100 100 96 100 L24 100 Q20 100 20 96 L20 52 Q20 48 24 48 Z"
+        fill="#1a6ec0" stroke="#0e2a52" stroke-width="2.4"/>
+  <!-- front pocket seam -->
+  <path d="M20 60 Q60 72 100 60" fill="none" stroke="#0e2a52" stroke-width="2" opacity="0.55"/>
+  <path d="M20 60 Q60 72 100 60" fill="none" stroke="#5aa0dd" stroke-width="1.4" opacity="0.7" stroke-dasharray="3 3"/>
+  <!-- edge stitching -->
+  <rect x="24" y="52" width="72" height="44" rx="4" fill="none" stroke="#e8cd82" stroke-width="1.3" stroke-dasharray="3 3.5" opacity="0.8"/>
+  <!-- shading -->
+  <path d="M20 84 L100 84 L100 96 Q100 100 96 100 L24 100 Q20 100 20 96 Z" fill="#000000" opacity="0.10"/>
+  <text x="60" y="87.73388" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="11.0" fill="#ffffff" letter-spacing="-0.5">beko</text><rect x="46.4" y="91.2" width="27.2" height="1.8" rx="0.9" fill="#ffffff"/>
+</symbol>
+        <symbol id="ic-mug" viewBox="0 0 120 120" overflow="visible">
+  <!-- handle -->
+  <path d="M86 52 Q108 50 108 70 Q108 90 86 88" fill="none" stroke="#0e2a52" stroke-width="9" stroke-linecap="round"/>
+  <path d="M86 52 Q108 50 108 70 Q108 90 86 88" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- body -->
+  <path d="M30 40 L90 40 L86 100 Q85 108 77 108 L43 108 Q35 108 34 100 Z" fill="#ffffff" stroke="#0e2a52" stroke-width="2.6" stroke-linejoin="round"/>
+  <!-- rim / inside -->
+  <ellipse cx="60" cy="40" rx="30" ry="8" fill="#0f4d8f" stroke="#0e2a52" stroke-width="2.6"/>
+  <ellipse cx="60" cy="40" rx="23" ry="5.2" fill="#1a6ec0"/>
+  <!-- highlight -->
+  <path d="M40 48 L37 98" stroke="#ffffff" stroke-width="5" opacity="0.6" stroke-linecap="round"/>
+  <path d="M60 44 L60 106" stroke="#000000" stroke-width="0" opacity="0"/>
+  <path d="M78 48 L80 96" stroke="#b7c2cf" stroke-width="2.4" opacity="0.4" stroke-linecap="round"/>
+  <text x="58" y="78.3928" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="12.9" fill="#1a6ec0" letter-spacing="-0.5">beko</text><rect x="42.0" y="82.4" width="32.0" height="2.2" rx="1.1" fill="#1a6ec0"/>
+</symbol>
+        <symbol id="ic-visor" viewBox="0 0 120 120" overflow="visible">
+  <!-- suction cups -->
+  <circle cx="42" cy="26" r="5.5" fill="#9aa7b6" stroke="#0e2a52" stroke-width="1.6"/>
+  <circle cx="78" cy="26" r="5.5" fill="#9aa7b6" stroke="#0e2a52" stroke-width="1.6"/>
+  <!-- reflective panel -->
+  <path d="M28 30 L92 30 Q98 30 97 40 L95 92 Q94 98 88 98 L32 98 Q26 98 25 92 L23 40 Q22 30 28 30 Z"
+        fill="#dfe6ee" stroke="#0e2a52" stroke-width="2.4" stroke-linejoin="round"/>
+  <clipPath id="visorClip"><path d="M28 30 L92 30 Q98 30 97 40 L95 92 Q94 98 88 98 L32 98 Q26 98 25 92 L23 40 Q22 30 28 30 Z"/></clipPath>
+  <g clip-path="url(#visorClip)"><rect x="27" y="30" width="6.5" height="66" fill="#ffffff" opacity="0.5"/><rect x="33.5" y="30" width="6.5" height="66" fill="#5a6b7d" opacity="0.28"/><rect x="40" y="30" width="6.5" height="66" fill="#ffffff" opacity="0.5"/><rect x="46.5" y="30" width="6.5" height="66" fill="#5a6b7d" opacity="0.28"/><rect x="53" y="30" width="6.5" height="66" fill="#ffffff" opacity="0.5"/><rect x="59.5" y="30" width="6.5" height="66" fill="#5a6b7d" opacity="0.28"/><rect x="66" y="30" width="6.5" height="66" fill="#ffffff" opacity="0.5"/><rect x="72.5" y="30" width="6.5" height="66" fill="#5a6b7d" opacity="0.28"/><rect x="79" y="30" width="6.5" height="66" fill="#ffffff" opacity="0.5"/><rect x="85.5" y="30" width="6.5" height="66" fill="#5a6b7d" opacity="0.28"/><rect x="92" y="30" width="6.5" height="66" fill="#ffffff" opacity="0.5"/><rect x="98.5" y="30" width="6.5" height="66" fill="#5a6b7d" opacity="0.28"/>
+    <path d="M20 30 L60 98" stroke="#ffffff" stroke-width="10" opacity="0.35"/>
+  </g>
+  <!-- beko badge -->
+  <rect x="42" y="55" width="36" height="20" rx="5" fill="#1a6ec0" stroke="#ffffff" stroke-width="2"/>
+  <text x="60" y="67.41604" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="7.1" fill="#ffffff" letter-spacing="-0.5">beko</text><rect x="51.2" y="69.6" width="17.6" height="1.2" rx="0.6" fill="#ffffff"/>
+</symbol>
+        <symbol id="ic-opener" viewBox="0 0 120 120" overflow="visible">
+  <!-- popped cap -->
+  <g transform="rotate(-18 96 34)">
+    <circle cx="96" cy="34" r="9" fill="#c8a24a" stroke="#0e2a52" stroke-width="1.8"/>
+    <circle cx="96" cy="34" r="5" fill="none" stroke="#e8cd82" stroke-width="1.4"/>
+  </g>
+  <!-- disc body -->
+  <circle cx="54" cy="60" r="38" fill="#1a6ec0" stroke="#0e2a52" stroke-width="2.6"/>
+  <!-- metal opener notch bitten out of the bottom rim -->
+  <path d="M54 98 A38 38 0 0 0 74 91 L74 91 A22 15 0 0 0 34 91 A38 38 0 0 0 54 98 Z"
+        fill="#dfe6ee" stroke="#0e2a52" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M54 92 L49 83 L59 83 Z" fill="#9aa7b6" stroke="#0e2a52" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- highlight -->
+  <path d="M30 42 A38 38 0 0 1 72 28" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.30" stroke-linecap="round"/>
+  <text x="54" y="60.3928" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="12.9" fill="#ffffff" letter-spacing="-0.5">beko</text><rect x="38.0" y="64.4" width="32.0" height="2.2" rx="1.1" fill="#ffffff"/>
+</symbol>
+      </defs>
+      <circle cx="300" cy="300" r="292" fill="url(#rimG)"/>
+      <circle cx="300" cy="300" r="292" fill="none" stroke="#5d4715" stroke-width="2"/>
+      <g id="bulbs" class="bulbs-live"></g>
+      <circle cx="300" cy="300" r="262" fill="#0a1730"/>
+      <circle cx="300" cy="300" r="262" fill="none" stroke="#5d4715" stroke-width="1.5"/>
+      <g id="rotor"></g>
+      <circle cx="300" cy="300" r="258" fill="url(#glowG)" pointer-events="none"/>
+      <circle cx="300" cy="300" r="74" fill="url(#hubG)" stroke="url(#rimG)" stroke-width="5"/>
+      <circle cx="300" cy="300" r="62" fill="none" stroke="rgba(200,162,74,.35)" stroke-width="1"/>
+      <text class="hub-word" x="300" y="296" text-anchor="middle">beko</text>
+      <text class="hub-sub"  x="300" y="318" text-anchor="middle">BLUE DAYS</text>
+    </svg>
+  </div>
+  <div class="caption" id="caption">Tournez pour révéler votre cadeau</div>
+
+  <div class="bar"><button class="btn slim" id="spin">Tourner la roue</button></div>
+</section>
+
+<canvas id="confetti"></canvas>
+<div class="badge" id="demo-badge">Mode démo — non connecté à la feuille</div>
+<div class="badge" id="sync-badge"></div>
+
+<!-- ============ RESULT ============ -->
+<div class="result" id="result" role="dialog" aria-modal="true" aria-live="polite">
+  <div class="prize" id="prize">
+    <div class="won">Vous avez gagné</div>
+    <div class="gift-stage" id="gift-stage">
+      <div class="gift" id="giftbox" aria-hidden="true"><svg class="giftsvg" viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gb-body" x1="0" y1="0" x2="0.25" y2="1"><stop offset="0" stop-color="#3f74d8"/><stop offset=".5" stop-color="#28509e"/><stop offset="1" stop-color="#15316f"/></linearGradient><linearGradient id="gb-lid" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#5a8dea"/><stop offset="1" stop-color="#1f3f86"/></linearGradient><linearGradient id="gb-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe9ad"/><stop offset=".45" stop-color="#d8ad4f"/><stop offset="1" stop-color="#916c22"/></linearGradient><linearGradient id="gb-goldH" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3cf"/><stop offset="1" stop-color="#caa04a"/></linearGradient><radialGradient id="gb-glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="rgba(255,244,214,.95)"/><stop offset="45%" stop-color="rgba(232,205,130,.4)"/><stop offset="100%" stop-color="rgba(232,205,130,0)"/></radialGradient><clipPath id="gb-clip"><rect x="20" y="66" width="80" height="74" rx="11"/></clipPath></defs><ellipse cx="60" cy="145" rx="40" ry="6" fill="rgba(0,0,0,.45)"/><g class="glow-grp"><circle cx="60" cy="60" r="66" fill="url(#gb-glow)"/></g><g class="rays-grp"><g fill="rgba(232,205,130,.5)"><path transform="rotate(0 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(30 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(60 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(90 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(120 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(150 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(180 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(210 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(240 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(270 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(300 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(330 60 60)" d="M60 60 L56 -6 L64 -6 Z"/></g></g><g class="body-grp"><rect x="20" y="66" width="80" height="74" rx="11" fill="url(#gb-body)" stroke="#0e2352" stroke-width="1.5"/><g clip-path="url(#gb-clip)"><ellipse cx="42" cy="74" rx="40" ry="26" fill="#ffffff" opacity=".14"/><rect x="53" y="66" width="14" height="74" fill="url(#gb-gold)"/><rect x="54.5" y="66" width="3" height="74" fill="#fff" opacity=".33"/><rect x="20" y="94" width="80" height="14" fill="url(#gb-gold)"/><rect x="20" y="95.5" width="80" height="3" fill="#fff" opacity=".3"/><ellipse class="light" cx="60" cy="69" rx="33" ry="12" fill="url(#gb-glow)" opacity="0"/><rect class="gloss-sweep" x="-8" y="66" width="12" height="74" fill="#fff" opacity=".16" transform="skewX(-16)"/></g></g><g class="lid-grp"><rect x="13" y="47" width="94" height="25" rx="9" fill="url(#gb-lid)" stroke="#0e2352" stroke-width="1.5"/><rect x="17" y="50" width="86" height="6" rx="3" fill="#fff" opacity=".22"/><rect x="53" y="47" width="14" height="25" fill="url(#gb-gold)"/><rect x="54.5" y="47" width="3" height="25" fill="#fff" opacity=".33"/><g class="bow"><path d="M58 46 C 50 60, 44 62, 40 64 C 46 60, 50 54, 55 48 Z" fill="url(#gb-gold)" stroke="#7a5c1e" stroke-width=".8"/><path d="M62 46 C 70 60, 76 62, 80 64 C 74 60, 70 54, 65 48 Z" fill="url(#gb-gold)" stroke="#7a5c1e" stroke-width=".8"/><path d="M60 44 C 44 24, 22 30, 28 44 C 32 54, 50 52, 60 44 Z" fill="url(#gb-goldH)" stroke="#7a5c1e" stroke-width="1"/><path d="M60 44 C 76 24, 98 30, 92 44 C 88 54, 70 52, 60 44 Z" fill="url(#gb-goldH)" stroke="#7a5c1e" stroke-width="1"/><path d="M40 32 C 32 34, 30 40, 33 44" fill="none" stroke="#fff6dd" stroke-width="2" stroke-linecap="round" opacity=".6"/><path d="M80 32 C 88 34, 90 40, 87 44" fill="none" stroke="#fff6dd" stroke-width="2" stroke-linecap="round" opacity=".6"/><rect x="53" y="36" width="14" height="16" rx="5" fill="url(#gb-gold)" stroke="#7a5c1e" stroke-width="1"/><rect x="55" y="37.5" width="3.4" height="13" rx="1.7" fill="#fff" opacity=".4"/></g></g></svg></div>
+    </div>
+    <div class="name" id="prize-name">—</div>
+    <div class="sub" id="prize-sub">—</div>
+    <button class="btn slim again" id="again">Nouveau joueur</button>
+  </div>
+</div>
+
+<script>
+/* =======================================================================
+   CONFIG — set API_URL to your Google Apps Script Web App /exec URL.
+   Leave it as 'PASTE...' to run in local DEMO mode (no saving).
+   ======================================================================= */
+const API_URL    = 'https://script.google.com/macros/s/AKfycbyRgaA25Ppbby6cuZUdf9hHHwJeo8_JlfEcU75T5XJNIgi6EFVy_NVb59FbqxpeeMI/exec';
+const ADMIN_USER = 'Admin';
+const ADMIN_PASS = '1234';
+const WEIGHT_MODE = 'remaining';   // must match Code.gs ('remaining' or 'total')
+
+const GOODIES = [{"key": "tote", "name": "Tote Bag", "sub": "Le sac en toile Blue Days"}, {"key": "cap", "name": "Casquette", "sub": "La casquette brodée beko"}, {"key": "cardholder", "name": "Porte-carte", "sub": "Le porte-carte en similicuir"}, {"key": "mug", "name": "Mug", "sub": "Le mug beko à emporter"}, {"key": "visor", "name": "Pare-soleil", "sub": "Le pare-soleil réfléchissant"}, {"key": "opener", "name": "Ouvre-bouteille", "sub": "Magnet & ouvre-bouteille"}];
+const TN_MAP  = {"Ariana": ["Ariana Ville", "Ettadhamen", "Kalaat Landlous", "La Soukra", "Mnihla", "Raoued", "Sidi Thabet"], "Beja": ["Amdoun", "Beja Nord", "Beja Sud", "Goubellat", "Mejez El Bab", "Nefza", "Teboursouk", "Testour", "Thibar"], "Ben Arous": ["Ben Arous", "Bou Mhel El Bassatine", "El Mourouj", "Ezzahra", "Fouchana", "Hammam Chatt", "Hammam Lif", "Megrine", "Mohamadia", "Mornag", "Nouvelle Medina", "Rades"], "Bizerte": ["Bizerte Nord", "Bizerte Sud", "El Alia", "Ghar El Melh", "Ghezala", "Jarzouna", "Joumine", "Mateur", "Menzel Bourguiba", "Menzel Jemil", "Ras Jebel", "Sejnane", "Tinja", "Utique"], "Gabes": ["El Hamma", "El Metouia", "Gabes Medina", "Gabes Ouest", "Gabes Sud", "Ghannouche", "Mareth", "Matmata", "Menzel Habib", "Nouvelle Matmata"], "Gafsa": ["Belkhir", "El Guettar", "El Ksar", "El Mdhilla", "Gafsa Nord", "Gafsa Sud", "Metlaoui", "Moulares", "Redeyef", "Sidi Aich", "Sned"], "Jendouba": ["Ain Draham", "Balta Bou Aouene", "Bou Salem", "Fernana", "Ghardimaou", "Jendouba", "Jendouba Nord", "Oued Mliz", "Tabarka"], "Kairouan": ["Bou Hajla", "Chebika", "Cherarda", "El Ala", "Haffouz", "Hajeb El Ayoun", "Kairouan Nord", "Kairouan Sud", "Nasrallah", "Oueslatia", "Sbikha"], "Kasserine": ["El Ayoun", "Ezzouhour  (Kasserine)", "Feriana", "Foussana", "Haidra", "Hassi El Frid", "Jediliane", "Kasserine Nord", "Kasserine Sud", "Mejel Bel Abbes", "Sbeitla", "Sbiba", "Thala"], "Kebili": ["Douz", "El Faouar", "Kebili Nord", "Kebili Sud", "Souk El Ahad"], "Kef": ["Dahmani", "El Ksour", "Jerissa", "Kalaa El Khasba", "Kalaat Sinane", "Le Kef Est", "Le Kef Ouest", "Le Sers", "Nebeur", "Sakiet Sidi Youssef", "Tajerouine", "Touiref"], "Mahdia": ["Bou Merdes", "Chorbane", "El Jem", "Hbira", "Ksour Essaf", "La Chebba", "Mahdia", "Melloulech", "Ouled Chamakh", "Sidi Alouene", "Souassi"], "Mannouba": ["Borj El Amri", "Douar Hicher", "El Battan", "Jedaida", "Mannouba", "Mornaguia", "Oued Ellil", "Tebourba"], "Medenine": ["Ajim", "Ben Guerdane", "Beni Khedache", "Houmet Essouk", "Medenine Nord", "Medenine Sud", "Midoun", "Sidi Makhlouf", "Zarzis"], "Monastir": ["Bekalta", "Bembla", "Beni Hassen", "Jemmal", "Ksar Helal", "Ksibet El Mediouni", "Moknine", "Monastir", "Ouerdanine", "Sahline", "Sayada Lamta Bou Hajar", "Teboulba", "Zeramdine"], "Nabeul": ["Beni Khalled", "Beni Khiar", "Bou Argoub", "Dar Chaabane Elfehri", "El Haouaria", "El Mida", "Grombalia", "Hammam El Ghezaz", "Hammamet", "Kelibia", "Korba", "Menzel Bouzelfa", "Menzel Temime", "Nabeul", "Soliman", "Takelsa"], "Sfax": ["Agareb", "Bir Ali Ben Khelifa", "El Amra", "El Hencha", "Esskhira", "Ghraiba", "Jebeniana", "Kerkenah", "Mahras", "Menzel Chaker", "Sakiet Eddaier", "Sakiet Ezzit", "Sfax Est", "Sfax Sud", "Sfax Ville"], "Sidi Bouzid": ["Ben Oun", "Bir El Haffey", "Cebbala", "Jilma", "Maknassy", "Menzel Bouzaiene", "Mezzouna", "Ouled Haffouz", "Regueb", "Sidi Bouzid Est", "Sidi Bouzid Ouest", "Souk Jedid"], "Siliana": ["Bargou", "Bou Arada", "El Aroussa", "Gaafour", "Kesra", "Le Krib", "Makthar", "Rohia", "Sidi Bou Rouis", "Siliana Nord", "Siliana Sud"], "Sousse": ["Akouda", "Bou Ficha", "Enfidha", "Hammam Sousse", "Hergla", "Kalaa El Kebira", "Kalaa Essghira", "Kondar", "Msaken", "Sidi Bou Ali", "Sidi El Heni", "Sousse Jaouhara", "Sousse Riadh", "Sousse Ville"], "Tataouine": ["Bir Lahmar", "Dhehiba", "Ghomrassen", "Remada", "Smar", "Tataouine Nord", "Tataouine Sud"], "Tozeur": ["Degueche", "Hezoua", "Nefta", "Tameghza", "Tozeur"], "Tunis": ["Bab Bhar", "Bab Souika", "Carthage", "Cite El Khadra", "El Hrairia", "El Kabbaria", "El Kram", "El Menzah", "El Omrane", "El Omrane Superieur", "El Ouerdia", "Essijoumi", "Ettahrir", "Ezzouhour  (Tunis)", "Jebel Jelloud", "La Goulette", "La Marsa", "La Medina", "Le Bardo", "Sidi El Bechir", "Sidi Hassine"], "Zaghouan": ["Bir Mcherga", "El Fahs", "Ennadhour", "Hammam Zriba", "Saouef", "Zaghouan"]};
+
+const DEMO = !API_URL || API_URL.indexOf('PASTE_') === 0;
+// Demo quantities (used only when API_URL is not set) — mirror the real stock so odds look realistic.
+const DEMO_QTY = {tote:850, cap:650, cardholder:500, mug:600, visor:650, opener:500};
+
+/* ---- geometry ---- */
+const CX=300, CY=300, R_IN=80, R_OUT=256, R_TILE=166, ICON=120, R_LABEL=236;
+const SEG_FILL=['#0b132b','#14306e'];
+const SPIN_MS=5600, SPIN_TURNS=6;
+const N=GOODIES.length, SW=360/N;
+const NS='http://www.w3.org/2000/svg';
+const $=id=>document.getElementById(id);
+function polar(r,deg){const a=(deg-90)*Math.PI/180;return [CX+r*Math.cos(a),CY+r*Math.sin(a)];}
+
+/* ---- in-memory state (loaded once at login) ---- */
+let INVENTORY = null;                // {key: remaining}  — null means "not loaded, use server fallback"
+const playedKeys = new Set();        // normalized "prenom|nom" of everyone who already played
+let currentPlayer = null;
+
+function normPart(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,''); }
+function playerKey(p){ return normPart(p.prenom)+'|'+normPart(p.nom); }
+
+/* ---- screens ---- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id));
+  const logged = id!=='screen-login';
+  $('logout').classList.toggle('show', logged);
+  $('mute').classList.toggle('show', logged);
+}
+
+/* ---- build wheel ---- */
+function buildWheel(){
+  const rotor=$('rotor'); rotor.innerHTML='';
+  GOODIES.forEach((g,i)=>{
+    const a0=i*SW, a1=(i+1)*SW, c=a0+SW/2;
+    const [x1,y1]=polar(R_IN,a0),[x2,y2]=polar(R_OUT,a0);
+    const [x3,y3]=polar(R_OUT,a1),[x4,y4]=polar(R_IN,a1);
+    const path=document.createElementNS(NS,'path');
+    path.setAttribute('d',`M ${x1} ${y1} L ${x2} ${y2} A ${R_OUT} ${R_OUT} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${R_IN} ${R_IN} 0 0 0 ${x1} ${y1} Z`);
+    path.setAttribute('fill',SEG_FILL[i%2]);
+    path.setAttribute('stroke','rgba(200,162,74,.55)'); path.setAttribute('stroke-width','1.6');
+    path.setAttribute('data-seg',i); rotor.appendChild(path);
+    const arcId='arc'+i, A=27;
+    const [lx,ly]=polar(R_LABEL,-A),[rx,ry]=polar(R_LABEL,A);
+    const arc=document.createElementNS(NS,'path');
+    arc.setAttribute('id',arcId);
+    arc.setAttribute('d',`M ${lx} ${ly} A ${R_LABEL} ${R_LABEL} 0 0 1 ${rx} ${ry}`);
+    arc.setAttribute('fill','none'); arc.setAttribute('transform',`rotate(${c} ${CX} ${CY})`);
+    rotor.appendChild(arc);
+    const txt=document.createElementNS(NS,'text'); txt.setAttribute('class','seg-label');
+    const tp=document.createElementNS(NS,'textPath');
+    tp.setAttribute('href','#'+arcId); tp.setAttribute('startOffset','50%'); tp.setAttribute('text-anchor','middle');
+    tp.textContent=g.name.toUpperCase(); txt.appendChild(tp); rotor.appendChild(txt);
+    const grp=document.createElementNS(NS,'g'); grp.setAttribute('transform',`rotate(${c} ${CX} ${CY})`);
+    const gx=CX, gy=CY-R_TILE;
+    const use=document.createElementNS(NS,'use');
+    use.setAttribute('href','#ic-'+g.key);
+    use.setAttribute('x',gx-ICON/2); use.setAttribute('y',gy-ICON/2);
+    use.setAttribute('width',ICON); use.setAttribute('height',ICON);
+    use.setAttribute('filter','url(#glowW)'); grp.appendChild(use); rotor.appendChild(grp);
+  });
+  const bulbs=$('bulbs'); bulbs.innerHTML='';
+  for(let i=0;i<24;i++){
+    const [bx,by]=polar(277,i*(360/24));
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',bx); c.setAttribute('cy',by); c.setAttribute('r',6.5); c.setAttribute('class','bulb');
+    bulbs.appendChild(c);
+  }
+}
+
+/* ---- sound ---- */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function blip(freq,dur,type='sine',vol=.09){
+  if(muted) return; const a=ac(); if(!a) return;
+  const o=a.createOscillator(),g=a.createGain();
+  o.type=type; o.frequency.value=freq; o.connect(g); g.connect(a.destination);
+  const t=a.currentTime; g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol,t+.008); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.start(t); o.stop(t+dur+.02);
+}
+const S={
+  tick(){ blip(880,.05,'square',.05); },
+  shimmer(){ [0,0.07,0.14,0.21].forEach((t,i)=>setTimeout(()=>blip(520+i*190,.10,'sine',.05),t*1000)); },
+  pop(){ blip(130,.18,'sine',.16); [1100,1500,1900,2400].forEach((f,i)=>setTimeout(()=>blip(f,.13,'triangle',.06),25+i*16)); },
+  win(){ [784,988,1175,1568,1976].forEach((f,i)=>setTimeout(()=>blip(f,.42,'triangle',.08),i*95)); },
+};
+
+/* ---- spin ---- */
+let rotation=0, spinning=false, startRot=0;
+function trackTicks(){
+  const ptr=$('pointer'); let last=-1; const start=performance.now();
+  (function loop(now){
+    if(!spinning) return;
+    const frac=Math.min(1,(now-start)/SPIN_MS);
+    const eased=1-Math.pow(1-frac,3);
+    const ang=startRot+(rotation-startRot)*eased;
+    const seg=Math.floor(((ang%360)+360)%360 / SW);
+    if(seg!==last){ last=seg; ptr.classList.remove('tick'); void ptr.offsetWidth; ptr.classList.add('tick'); S.tick(); }
+    requestAnimationFrame(loop);
+  })(start);
+}
+function spinToIndex(index,onDone){
+  const rotor=$('rotor');
+  const center=index*SW+SW/2;
+  const jitter=(Math.random()*2-1)*(SW/2-8);
+  const wanted=(((-center+jitter)%360)+360)%360;
+  const base=rotation+SPIN_TURNS*360;
+  const next=base+((((wanted-base)%360)+360)%360);
+  startRot=rotation; rotation=next;
+  spinning=true; trackTicks();
+  rotor.style.setProperty('--spin-ms',SPIN_MS+'ms'); rotor.classList.add('rotor-spin');
+  requestAnimationFrame(()=>{ rotor.style.transform=`rotate(${next}deg)`; });
+  setTimeout(()=>{ spinning=false; onDone(); },SPIN_MS+90);
+}
+
+/* ---- confetti ---- */
+const cv=$('confetti'), ctx=cv.getContext('2d');
+let parts=[], rafC=null;
+function sizeCanvas(){ cv.width=innerWidth*devicePixelRatio; cv.height=innerHeight*devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+sizeCanvas(); addEventListener('resize',sizeCanvas);
+function burst(){
+  const cols=['#c8a24a','#e8cd82','#1a6ec0','#5aa0dd','#f4efe2']; parts=[];
+  for(let i=0;i<130;i++) parts.push({x:innerWidth/2,y:innerHeight*0.4,vx:(Math.random()-.5)*9,vy:-(Math.random()*11+5),
+    g:0.28+Math.random()*0.12,s:6+Math.random()*7,rot:Math.random()*6.28,vr:(Math.random()-.5)*.35,c:cols[i%cols.length],life:0});
+  if(rafC) cancelAnimationFrame(rafC);
+  (function anim(){
+    ctx.clearRect(0,0,cv.width,cv.height); let alive=false;
+    parts.forEach(p=>{ p.life++; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      if(p.y<innerHeight+30) alive=true;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.c; ctx.globalAlpha=Math.max(0,1-p.life/150);
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); ctx.restore(); });
+    if(alive) rafC=requestAnimationFrame(anim); else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+/* ---- reveal ---- */
+function highlight(index,on){
+  const seg=document.querySelector('#rotor path[data-seg="'+index+'"]');
+  if(seg) seg.setAttribute('fill', on ? '#1e57b8' : SEG_FILL[index%2]);
+}
+let lastWin=-1;
+function reveal(index){
+  const g=GOODIES[index];
+  highlight(index,true);
+  const stage=$('gift-stage'), box=$('giftbox'), prize=$('prize');
+  box.classList.remove('opening');
+  stage.querySelectorAll('.goodie-pop,.spark').forEach(n=>n.remove());
+  prize.classList.remove('revealed');
+  $('prize-name').textContent=g.name; $('prize-sub').textContent=g.sub;
+  $('result').classList.add('show');
+  void box.offsetWidth; S.shimmer();
+  setTimeout(()=>{
+    box.classList.add('opening'); S.pop();
+    for(let i=0;i<18;i++){
+      const s=document.createElement('span'); s.className='spark';
+      const ang=Math.random()*Math.PI*2, rr=32+Math.random()*46;
+      s.style.setProperty('--dx', Math.round(Math.cos(ang)*rr)+'px');
+      s.style.setProperty('--dy', Math.round(Math.sin(ang)*rr)+'px');
+      s.style.animationDelay=(Math.random()*0.16).toFixed(2)+'s'; stage.appendChild(s);
+    }
+    const pop=document.createElement('div'); pop.className='goodie-pop go';
+    pop.innerHTML='<svg viewBox="0 0 120 120"><use href="#ic-'+g.key+'"/></svg>';
+    pop.addEventListener('animationend',function onEnd(e){
+      if(e.animationName==='popRise'){ pop.classList.remove('go'); pop.classList.add('float'); pop.removeEventListener('animationend',onEnd); }
+    });
+    stage.appendChild(pop); burst(); S.win();
+  }, 480);
+  setTimeout(()=>{ prize.classList.add('revealed'); }, 1350);
+}
+
+/* ======================================================================
+   BACKEND  (fetch with text/plain → no CORS preflight)
+   ====================================================================== */
+async function postJSON(payload){
+  const res = await fetch(API_URL, {
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+/* load stock + already-played players once, right after login */
+async function loadInit(){
+  if(DEMO){ INVENTORY={}; GOODIES.forEach(g=>INVENTORY[g.key]=DEMO_QTY[g.key]||100); return true; }
+  try{
+    const data = await postJSON({action:'init'});
+    if(data && data.ok){
+      INVENTORY={};
+      GOODIES.forEach(g=>{ const s=data.stock && data.stock[g.key]; INVENTORY[g.key]= s ? Math.max(0,s.remaining) : 0; });
+      (data.players||[]).forEach(k=>playedKeys.add(k));
+      return true;
+    }
+  }catch(e){}
+  INVENTORY=null;   // fallback: spins will ask the server to pick (slower)
+  return false;
+}
+
+/* refresh stock between players (non-blocking) when everything is synced */
+async function refreshStock(){
+  if(DEMO || !INVENTORY || pending.length) return;
+  try{
+    const data = await postJSON({action:'init'});
+    if(data && data.ok){
+      GOODIES.forEach(g=>{ const s=data.stock && data.stock[g.key]; if(s) INVENTORY[g.key]=Math.max(0,s.remaining); });
+      (data.players||[]).forEach(k=>playedKeys.add(k));
+    }
+  }catch(e){}
+}
+
+/* ---- background record queue (survives reloads via localStorage) ---- */
+const PENDING_KEY='beko_pending_records';
+function loadPending(){ try{ return JSON.parse(localStorage.getItem(PENDING_KEY))||[]; }catch(e){ return []; } }
+function savePending(a){ try{ localStorage.setItem(PENDING_KEY, JSON.stringify(a)); }catch(e){} }
+let pending = loadPending();
+let flushing=false;
+function updateSyncBadge(){
+  const b=$('sync-badge');
+  if(pending.length){ b.textContent='⇅ '+pending.length+' à synchroniser'; b.classList.add('show'); }
+  else b.classList.remove('show');
+}
+function queueRecord(rec){ pending.push(rec); savePending(pending); updateSyncBadge(); flushPending(); }
+async function flushPending(){
+  if(flushing || DEMO || !pending.length) return;
+  flushing=true;
+  while(pending.length){
+    const rec=pending[0];
+    try{
+      const data = await postJSON({action:'record', player:rec.player, key:rec.key});
+      if(data && (data.ok || data.error==='duplicate')){ pending.shift(); savePending(pending); }
+      else break;   // unexpected error — keep it, retry later
+    }catch(e){ break; }   // network down — retry later
+  }
+  flushing=false; updateSyncBadge();
+}
+setInterval(flushPending, 8000);
+addEventListener('online', flushPending);
+
+/* ---- local weighted pick (instant) ---- */
+function localPick(){
+  const pool=[]; let tot=0;
+  GOODIES.forEach((g,i)=>{
+    const rem = INVENTORY[g.key]||0;
+    const weight = (WEIGHT_MODE==='total') ? (DEMO?DEMO_QTY[g.key]:rem) : rem;   // 'total' uses original qty
+    if(rem>0 && weight>0){ pool.push({i,weight}); tot+=weight; }
+  });
+  if(!tot) return null;
+  let r=Math.random()*tot, acc=0, pick=pool[pool.length-1];
+  for(const it of pool){ acc+=it.weight; if(r<=acc){ pick=it; break; } }
+  return pick.i;
+}
+
+/* ---- LOGIN ---- */
+$('btn-login').addEventListener('click', async ()=>{
+  const u=$('u').value.trim(), p=$('p').value;
+  if(u!==ADMIN_USER || p!==ADMIN_PASS){
+    const m=$('login-msg'); m.className='notice err'; m.textContent='Identifiant ou mot de passe incorrect.'; return;
+  }
+  $('login-msg').textContent=''; $('p').value='';
+  const btn=$('btn-login'); btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Chargement du stock…';
+  await loadInit();                 // pay the network cost ONCE, here
+  btn.disabled=false; btn.textContent='Se connecter';
+  if(INVENTORY===null){ const m=$('login-msg'); m.className='notice ok'; m.textContent='Connecté (stock indisponible — mode secours).'; }
+  resetForm(); refreshStock(); showScreen('screen-form');
+});
+$('p').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btn-login').click(); });
+$('logout').addEventListener('click',()=>{ currentPlayer=null; $('u').value=''; $('p').value=''; showScreen('screen-login'); });
+
+/* ---- FORM ---- */
+function fillGovernorates(){
+  const sel=$('f-gov');
+  Object.keys(TN_MAP).sort().forEach(g=>{ const o=document.createElement('option'); o.value=g; o.textContent=g; sel.appendChild(o); });
+}
+$('f-gov').addEventListener('change',()=>{
+  const del=$('f-del'); del.innerHTML=''; const g=$('f-gov').value;
+  if(!g){ del.disabled=true; del.innerHTML='<option value="">— Choisir d\'abord le gouvernorat —</option>'; return; }
+  del.disabled=false; del.innerHTML='<option value="">— Choisir —</option>';
+  (TN_MAP[g]||[]).forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; del.appendChild(o); });
+});
+let achat='';
+$('f-achat').querySelectorAll('button').forEach(b=>{
+  b.addEventListener('click',()=>{ achat=b.dataset.v; $('f-achat').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x===b)); });
+});
+function resetForm(){
+  $('f-prenom').value=''; $('f-nom').value=''; $('f-tel').value='';
+  $('f-gov').value=''; $('f-del').innerHTML='<option value="">— Choisir d\'abord le gouvernorat —</option>'; $('f-del').disabled=true;
+  achat=''; $('f-achat').querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+  const m=$('form-msg'); m.textContent=''; m.className='notice';
+}
+function formError(msg){ const m=$('form-msg'); m.className='notice err'; m.textContent=msg; }
+function escapeHtml(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* Tunisia phone: 8 digits starting with 2/3/4/5/7/9. Accepts an optional +216 / 00216 / 216
+ * prefix and any spaces, dashes, dots or parentheses. Returns the canonical 8-digit number,
+ * or null if invalid. Store the canonical form; keep what the operator typed for display. */
+function parseTNPhone(raw){
+  const cleaned = String(raw||'').replace(/[\s\-.()]/g,'');
+  const m = cleaned.match(/^(?:\+216|00216|216)?([24579]\d{7})$/);
+  return m ? m[1] : null;
+}
+function formatTNPhone(eight){   // "22 123 456" for display
+  return eight ? eight.replace(/^(\d{2})(\d{3})(\d{3})$/, '$1 $2 $3') : '';
+}
+$('f-tel').addEventListener('input',()=>{
+  // keep only digits, +, and spaces while typing — no scrubbing that fights the user
+  const el=$('f-tel'); el.value = el.value.replace(/[^\d+\s]/g,'');
+});
+
+$('btn-start').addEventListener('click',()=>{
+  const prenom=$('f-prenom').value.trim(), nom=$('f-nom').value.trim();
+  const telRaw=$('f-tel').value, tel=parseTNPhone(telRaw);
+  const gov=$('f-gov').value, del=$('f-del').value;
+  if(!prenom) return formError('Le prénom est requis.');
+  if(!nom)    return formError('Le nom est requis.');
+  if(!telRaw.trim()) return formError('Le numéro de téléphone est requis.');
+  if(!tel)    return formError('Numéro invalide. 8 chiffres tunisiens (commence par 2, 4, 5, 7 ou 9).');
+  if(!gov)    return formError('Choisissez un gouvernorat.');
+  if(!del)    return formError('Choisissez une délégation.');
+  if(!achat)  return formError('Indiquez si le client a acheté aujourd\'hui.');
+  const player={prenom, nom, telephone:tel, gouvernorat:gov, delegation:del, achat};
+  if(playedKeys.has(playerKey(player))) return formError('Ce joueur a déjà participé.');
+  currentPlayer=player;
+  $('player-tag').innerHTML='Joueur : <b>'+escapeHtml(prenom+' '+nom)+'</b> · '+escapeHtml(formatTNPhone(tel));
+  $('spin').disabled=false; $('caption').textContent='Tournez pour révéler votre cadeau';
+  showScreen('screen-game');
+});
+
+/* ---- SPIN ---- */
+$('spin').addEventListener('click', async ()=>{
+  ac(); if(spinning || !currentPlayer) return;
+  if(lastWin>=0){ highlight(lastWin,false); lastWin=-1; }
+  const btn=$('spin'); btn.disabled=true;
+
+  if(INVENTORY){
+    /* FAST PATH — decide locally, spin immediately, record in the background */
+    const idx=localPick();
+    if(idx===null){ btn.disabled=true; $('caption').textContent='Stock épuisé — plus de goodies disponibles.'; return; }
+    const g=GOODIES[idx];
+    INVENTORY[g.key]=Math.max(0,(INVENTORY[g.key]||0)-1);   // reserve one locally
+    playedKeys.add(playerKey(currentPlayer));
+    if(!DEMO) queueRecord({player:currentPlayer, key:g.key});
+    $('caption').textContent='La roue tourne…';
+    spinToIndex(idx, ()=>{ lastWin=idx; reveal(idx); $('caption').textContent='Cadeau attribué !'; });
+  } else {
+    /* FALLBACK — server decides (only if the login preload failed) */
+    $('caption').textContent='Enregistrement…';
+    let data;
+    try{ data = await postJSON({action:'play', player:currentPlayer}); }
+    catch(e){ btn.disabled=false; $('caption').textContent='Erreur de connexion. Réessayez.'; return; }
+    if(!data || !data.ok){
+      const r=data && data.error;
+      if(r==='duplicate'){ $('spin').disabled=false; showScreen('screen-form'); formError('Ce joueur a déjà participé.'); }
+      else if(r==='empty'){ $('caption').textContent='Stock épuisé — plus de goodies disponibles.'; }
+      else { btn.disabled=false; $('caption').textContent='Impossible d\'enregistrer. Réessayez.'; }
+      return;
+    }
+    playedKeys.add(playerKey(currentPlayer));
+    const idx=Math.max(0, GOODIES.findIndex(x=>x.key===data.key));
+    $('caption').textContent='La roue tourne…';
+    spinToIndex(idx, ()=>{ lastWin=idx; reveal(idx); $('caption').textContent='Cadeau attribué !'; });
+  }
+});
+
+/* result → new player */
+$('again').addEventListener('click',()=>{
+  $('result').classList.remove('show');
+  currentPlayer=null; resetForm(); refreshStock(); showScreen('screen-form');
+});
+
+/* ---- mute ---- */
+$('mute').addEventListener('click',()=>{
+  muted=!muted; $('mute').textContent=muted?'✕':'♪';
+  $('mute').setAttribute('aria-label',muted?'Activer le son':'Couper le son');
+});
+
+/* ---- init ---- */
+buildWheel();
+fillGovernorates();
+if(DEMO) $('demo-badge').classList.add('show');
+updateSyncBadge();
+flushPending();            // resend anything left over from a previous session
+showScreen('screen-login');
+</script>
+</body>
+</html>
