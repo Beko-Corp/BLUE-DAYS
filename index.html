@@ -151,18 +151,22 @@
   .goodie-pop.float{animation:popBob 2.8s ease-in-out infinite;opacity:1;}
   @keyframes popBob{0%,100%{transform:translate(-50%,calc(-50% - 84px)) scale(1) rotate(-4deg);}
     50%{transform:translate(-50%,calc(-50% - 94px)) scale(1.05) rotate(4deg);}}
-  .prize .name,.prize .pname,.prize .pgot,.prize .pfrom,.prize .again{opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s;}
+  .prize .name,.prize .pname,.prize .pgot,.prize .pfrom,.prize .again,.prize .lost-msg{opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s;}
   .prize.revealed .pname{opacity:1;transform:none;}
   .prize.revealed .pgot {opacity:1;transform:none;transition-delay:.06s;}
   .prize.revealed .name {opacity:1;transform:none;transition-delay:.12s;}
   .prize.revealed .pfrom{opacity:1;transform:none;transition-delay:.20s;}
   .prize.revealed .again{opacity:1;transform:none;transition-delay:.28s;}
+  .prize.revealed .lost-msg{opacity:1;transform:none;transition-delay:.12s;}
   .prize .pname{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--brass-bright);margin-top:2px;line-height:1.15;}
   .prize .pgot{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:rgba(244,239,226,.65);font-weight:600;margin:8px 0 2px;}
   .prize .name{font-family:Georgia,serif;font-size:30px;font-weight:700;color:var(--bone);margin-top:2px;line-height:1.15;}
   .prize .pfrom{font-size:13px;color:rgba(244,239,226,.7);margin-top:10px;letter-spacing:.02em;}
   .prize .pfrom .beko-mark{font-family:Arial,Helvetica,sans-serif;font-weight:800;color:var(--brass-bright);letter-spacing:-0.5px;font-size:15px;}
   .prize .again{margin-top:22px;}
+  .lost-msg{display:none;font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--bone);line-height:1.4;margin:20px 0 4px;}
+  .prize.lost .gift-stage,.prize.lost .pname,.prize.lost .pgot,.prize.lost .name,.prize.lost .pfrom{display:none;}
+  .prize.lost .lost-msg{display:block;}
 
   #confetti{position:fixed;inset:0;z-index:19;pointer-events:none;}
 
@@ -353,7 +357,7 @@
 <!-- ============ RESULT ============ -->
 <div class="result" id="result" role="dialog" aria-modal="true" aria-live="polite">
   <div class="prize" id="prize">
-    <div class="won">Vous avez gagné</div>
+    <div class="won" id="won-text">Vous avez gagné</div>
     <div class="gift-stage" id="gift-stage">
       <div class="gift" id="giftbox" aria-hidden="true"><svg class="giftsvg" viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gb-body" x1="0" y1="0" x2="0.25" y2="1"><stop offset="0" stop-color="#3f74d8"/><stop offset=".5" stop-color="#28509e"/><stop offset="1" stop-color="#15316f"/></linearGradient><linearGradient id="gb-lid" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#5a8dea"/><stop offset="1" stop-color="#1f3f86"/></linearGradient><linearGradient id="gb-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe9ad"/><stop offset=".45" stop-color="#d8ad4f"/><stop offset="1" stop-color="#916c22"/></linearGradient><linearGradient id="gb-goldH" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3cf"/><stop offset="1" stop-color="#caa04a"/></linearGradient><radialGradient id="gb-glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="rgba(255,244,214,.95)"/><stop offset="45%" stop-color="rgba(232,205,130,.4)"/><stop offset="100%" stop-color="rgba(232,205,130,0)"/></radialGradient><clipPath id="gb-clip"><rect x="20" y="66" width="80" height="74" rx="11"/></clipPath></defs><ellipse cx="60" cy="145" rx="40" ry="6" fill="rgba(0,0,0,.45)"/><g class="glow-grp"><circle cx="60" cy="60" r="66" fill="url(#gb-glow)"/></g><g class="rays-grp"><g fill="rgba(232,205,130,.5)"><path transform="rotate(0 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(30 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(60 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(90 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(120 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(150 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(180 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(210 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(240 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(270 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(300 60 60)" d="M60 60 L56 -6 L64 -6 Z"/><path transform="rotate(330 60 60)" d="M60 60 L56 -6 L64 -6 Z"/></g></g><g class="body-grp"><rect x="20" y="66" width="80" height="74" rx="11" fill="url(#gb-body)" stroke="#0e2352" stroke-width="1.5"/><g clip-path="url(#gb-clip)"><ellipse cx="42" cy="74" rx="40" ry="26" fill="#ffffff" opacity=".14"/><rect x="53" y="66" width="14" height="74" fill="url(#gb-gold)"/><rect x="54.5" y="66" width="3" height="74" fill="#fff" opacity=".33"/><rect x="20" y="94" width="80" height="14" fill="url(#gb-gold)"/><rect x="20" y="95.5" width="80" height="3" fill="#fff" opacity=".3"/><ellipse class="light" cx="60" cy="69" rx="33" ry="12" fill="url(#gb-glow)" opacity="0"/><rect class="gloss-sweep" x="-8" y="66" width="12" height="74" fill="#fff" opacity=".16" transform="skewX(-16)"/></g></g><g class="lid-grp"><rect x="13" y="47" width="94" height="25" rx="9" fill="url(#gb-lid)" stroke="#0e2352" stroke-width="1.5"/><rect x="17" y="50" width="86" height="6" rx="3" fill="#fff" opacity=".22"/><rect x="53" y="47" width="14" height="25" fill="url(#gb-gold)"/><rect x="54.5" y="47" width="3" height="25" fill="#fff" opacity=".33"/><g class="bow"><path d="M58 46 C 50 60, 44 62, 40 64 C 46 60, 50 54, 55 48 Z" fill="url(#gb-gold)" stroke="#7a5c1e" stroke-width=".8"/><path d="M62 46 C 70 60, 76 62, 80 64 C 74 60, 70 54, 65 48 Z" fill="url(#gb-gold)" stroke="#7a5c1e" stroke-width=".8"/><path d="M60 44 C 44 24, 22 30, 28 44 C 32 54, 50 52, 60 44 Z" fill="url(#gb-goldH)" stroke="#7a5c1e" stroke-width="1"/><path d="M60 44 C 76 24, 98 30, 92 44 C 88 54, 70 52, 60 44 Z" fill="url(#gb-goldH)" stroke="#7a5c1e" stroke-width="1"/><path d="M40 32 C 32 34, 30 40, 33 44" fill="none" stroke="#fff6dd" stroke-width="2" stroke-linecap="round" opacity=".6"/><path d="M80 32 C 88 34, 90 40, 87 44" fill="none" stroke="#fff6dd" stroke-width="2" stroke-linecap="round" opacity=".6"/><rect x="53" y="36" width="14" height="16" rx="5" fill="url(#gb-gold)" stroke="#7a5c1e" stroke-width="1"/><rect x="55" y="37.5" width="3.4" height="13" rx="1.7" fill="#fff" opacity=".4"/></g></g></svg></div>
     </div>
@@ -361,6 +365,7 @@
     <div class="pgot"><span>reçoit</span></div>
     <div class="name" id="prize-name">—</div>
     <div class="pfrom">de la part de <span class="beko-mark">beko</span></div>
+    <div class="lost-msg" id="lost-msg">—</div>
     <button class="btn slim again" id="again">Nouveau joueur</button>
   </div>
 </div>
@@ -375,9 +380,8 @@
 const API_URL    = 'https://script.google.com/macros/s/AKfycbyDNBRdplEIIRyYL_j6v85bKI95vTU6B3shR6GIfXcvj4u2g5XDxD7M9VbPixZPwAk/exec';
 const WEIGHT_MODE = 'remaining';   // must match Code.gs ('remaining' or 'total')
 
-const GOODIES = [{"key": "tote", "name": "Tote Bag", "sub": "Le sac en toile Blue Days"}, {"key": "cap", "name": "Casquette", "sub": "La casquette brodée beko"}, {"key": "again", "name": "Rejouez", "sub": "Un tour bonus, tournez à nouveau"}, {"key": "mug", "name": "Mug", "sub": "Le mug beko à emporter"}, {"key": "visor", "name": "Pare-soleil", "sub": "Le pare-soleil réfléchissant"}, {"key": "opener", "name": "Ouvre-bouteille", "sub": "Magnet & ouvre-bouteille"}];
-const AGAIN_KEY    = 'again';   // wheel segment that isn't a real prize — landing here just grants another spin
-const AGAIN_WEIGHT = 220;       // its odds, on the same scale as the goodies' remaining-stock weights
+const GOODIES = [{"key": "tote", "name": "Tote Bag", "sub": "Le sac en toile Blue Days"}, {"key": "empty1", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "cap", "name": "Casquette", "sub": "La casquette brodée beko"}, {"key": "empty2", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "mug", "name": "Mug", "sub": "Le mug beko à emporter"}, {"key": "empty3", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "visor", "name": "Pare-soleil", "sub": "Le pare-soleil réfléchissant"}, {"key": "empty4", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "opener", "name": "Ouvre-bouteille", "sub": "Magnet & ouvre-bouteille"}, {"key": "empty5", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}];
+const EMPTY_WEIGHT = 200;   // fixed odds per "Perdu" wedge — losing doesn't consume any stock
 const TN_MAP  = {"Ariana": ["Ariana Ville", "Ettadhamen", "Kalaat Landlous", "La Soukra", "Mnihla", "Raoued", "Sidi Thabet"], "Beja": ["Amdoun", "Beja Nord", "Beja Sud", "Goubellat", "Mejez El Bab", "Nefza", "Teboursouk", "Testour", "Thibar"], "Ben Arous": ["Ben Arous", "Bou Mhel El Bassatine", "El Mourouj", "Ezzahra", "Fouchana", "Hammam Chatt", "Hammam Lif", "Megrine", "Mohamadia", "Mornag", "Nouvelle Medina", "Rades"], "Bizerte": ["Bizerte Nord", "Bizerte Sud", "El Alia", "Ghar El Melh", "Ghezala", "Jarzouna", "Joumine", "Mateur", "Menzel Bourguiba", "Menzel Jemil", "Ras Jebel", "Sejnane", "Tinja", "Utique"], "Gabes": ["El Hamma", "El Metouia", "Gabes Medina", "Gabes Ouest", "Gabes Sud", "Ghannouche", "Mareth", "Matmata", "Menzel Habib", "Nouvelle Matmata"], "Gafsa": ["Belkhir", "El Guettar", "El Ksar", "El Mdhilla", "Gafsa Nord", "Gafsa Sud", "Metlaoui", "Moulares", "Redeyef", "Sidi Aich", "Sned"], "Jendouba": ["Ain Draham", "Balta Bou Aouene", "Bou Salem", "Fernana", "Ghardimaou", "Jendouba", "Jendouba Nord", "Oued Mliz", "Tabarka"], "Kairouan": ["Bou Hajla", "Chebika", "Cherarda", "El Ala", "Haffouz", "Hajeb El Ayoun", "Kairouan Nord", "Kairouan Sud", "Nasrallah", "Oueslatia", "Sbikha"], "Kasserine": ["El Ayoun", "Ezzouhour  (Kasserine)", "Feriana", "Foussana", "Haidra", "Hassi El Frid", "Jediliane", "Kasserine Nord", "Kasserine Sud", "Mejel Bel Abbes", "Sbeitla", "Sbiba", "Thala"], "Kebili": ["Douz", "El Faouar", "Kebili Nord", "Kebili Sud", "Souk El Ahad"], "Kef": ["Dahmani", "El Ksour", "Jerissa", "Kalaa El Khasba", "Kalaat Sinane", "Le Kef Est", "Le Kef Ouest", "Le Sers", "Nebeur", "Sakiet Sidi Youssef", "Tajerouine", "Touiref"], "Mahdia": ["Bou Merdes", "Chorbane", "El Jem", "Hbira", "Ksour Essaf", "La Chebba", "Mahdia", "Melloulech", "Ouled Chamakh", "Sidi Alouene", "Souassi"], "Mannouba": ["Borj El Amri", "Douar Hicher", "El Battan", "Jedaida", "Mannouba", "Mornaguia", "Oued Ellil", "Tebourba"], "Medenine": ["Ajim", "Ben Guerdane", "Beni Khedache", "Houmet Essouk", "Medenine Nord", "Medenine Sud", "Midoun", "Sidi Makhlouf", "Zarzis"], "Monastir": ["Bekalta", "Bembla", "Beni Hassen", "Jemmal", "Ksar Helal", "Ksibet El Mediouni", "Moknine", "Monastir", "Ouerdanine", "Sahline", "Sayada Lamta Bou Hajar", "Teboulba", "Zeramdine"], "Nabeul": ["Beni Khalled", "Beni Khiar", "Bou Argoub", "Dar Chaabane Elfehri", "El Haouaria", "El Mida", "Grombalia", "Hammam El Ghezaz", "Hammamet", "Kelibia", "Korba", "Menzel Bouzelfa", "Menzel Temime", "Nabeul", "Soliman", "Takelsa"], "Sfax": ["Agareb", "Bir Ali Ben Khelifa", "El Amra", "El Hencha", "Esskhira", "Ghraiba", "Jebeniana", "Kerkenah", "Mahras", "Menzel Chaker", "Sakiet Eddaier", "Sakiet Ezzit", "Sfax Est", "Sfax Sud", "Sfax Ville"], "Sidi Bouzid": ["Ben Oun", "Bir El Haffey", "Cebbala", "Jilma", "Maknassy", "Menzel Bouzaiene", "Mezzouna", "Ouled Haffouz", "Regueb", "Sidi Bouzid Est", "Sidi Bouzid Ouest", "Souk Jedid"], "Siliana": ["Bargou", "Bou Arada", "El Aroussa", "Gaafour", "Kesra", "Le Krib", "Makthar", "Rohia", "Sidi Bou Rouis", "Siliana Nord", "Siliana Sud"], "Sousse": ["Akouda", "Bou Ficha", "Enfidha", "Hammam Sousse", "Hergla", "Kalaa El Kebira", "Kalaa Essghira", "Kondar", "Msaken", "Sidi Bou Ali", "Sidi El Heni", "Sousse Jaouhara", "Sousse Riadh", "Sousse Ville"], "Tataouine": ["Bir Lahmar", "Dhehiba", "Ghomrassen", "Remada", "Smar", "Tataouine Nord", "Tataouine Sud"], "Tozeur": ["Degueche", "Hezoua", "Nefta", "Tameghza", "Tozeur"], "Tunis": ["Bab Bhar", "Bab Souika", "Carthage", "Cite El Khadra", "El Hrairia", "El Kabbaria", "El Kram", "El Menzah", "El Omrane", "El Omrane Superieur", "El Ouerdia", "Essijoumi", "Ettahrir", "Ezzouhour  (Tunis)", "Jebel Jelloud", "La Goulette", "La Marsa", "La Medina", "Le Bardo", "Sidi El Bechir", "Sidi Hassine"], "Zaghouan": ["Bir Mcherga", "El Fahs", "Ennadhour", "Hammam Zriba", "Saouef", "Zaghouan"]};
 
 const DEMO = !API_URL || API_URL.indexOf('PASTE_') === 0;
@@ -387,8 +391,8 @@ const DEMO_QTY = {tote:850, cap:650, mug:600, visor:650, opener:500};
 /* ---- geometry ---- */
 const CX=300, CY=300, R_IN=80, R_OUT=256, R_TILE=166, ICON=120, R_LABEL=236;
 const SEG_FILL=['#0b132b','#14306e'];
-const AGAIN_FILL='#c8a24a';   // gold — marks the "Rejouez" wedge as not a real prize
-function segFill(i){ return GOODIES[i] && GOODIES[i].key===AGAIN_KEY ? AGAIN_FILL : SEG_FILL[i%2]; }
+const EMPTY_FILL='#2b3648';   // muted slate — marks a "Perdu" wedge as not a real prize
+function segFill(i){ return GOODIES[i] && GOODIES[i].empty ? EMPTY_FILL : SEG_FILL[i%2]; }
 const SPIN_MS=5600, SPIN_TURNS=6;
 const N=GOODIES.length, SW=360/N;
 const NS='http://www.w3.org/2000/svg';
@@ -434,7 +438,7 @@ function buildWheel(){
     const tp=document.createElementNS(NS,'textPath');
     tp.setAttribute('href','#'+arcId); tp.setAttribute('startOffset','50%'); tp.setAttribute('text-anchor','middle');
     tp.textContent=g.name.toUpperCase(); txt.appendChild(tp); rotor.appendChild(txt);
-    if(g.key!==AGAIN_KEY){
+    if(!g.empty){
       const grp=document.createElementNS(NS,'g'); grp.setAttribute('transform',`rotate(${c} ${CX} ${CY})`);
       const gx=CX, gy=CY-R_TILE;
       const use=document.createElementNS(NS,'use');
@@ -530,6 +534,8 @@ function reveal(index){
   const g=GOODIES[index];
   highlight(index,true);
   const stage=$('gift-stage'), box=$('giftbox'), prize=$('prize');
+  prize.classList.remove('lost');
+  $('won-text').textContent='Vous avez gagné';
   box.classList.remove('opening');
   stage.querySelectorAll('.goodie-pop,.spark').forEach(n=>n.remove());
   prize.classList.remove('revealed');
@@ -651,14 +657,16 @@ addEventListener('online', flushPending);
 function localPick(){
   const pool=[]; let tot=0;
   GOODIES.forEach((g,i)=>{
-    if(g.key===AGAIN_KEY) return;   // not real stock — weighted in separately below
-    const rem = INVENTORY[g.key]||0;
-    const weight = (WEIGHT_MODE==='total') ? (DEMO?DEMO_QTY[g.key]:rem) : rem;   // 'total' uses original qty
-    if(rem>0 && weight>0){ pool.push({i,weight}); tot+=weight; }
+    let weight;
+    if(g.empty){
+      weight = EMPTY_WEIGHT;   // fixed odds, not tied to any stock
+    }else{
+      const rem = INVENTORY[g.key]||0;
+      weight = rem>0 ? ((WEIGHT_MODE==='total') ? (DEMO?DEMO_QTY[g.key]:rem) : rem) : 0;   // 'total' uses original qty
+    }
+    if(weight>0){ pool.push({i,weight}); tot+=weight; }
   });
-  if(!pool.length) return null;   // truly out of stock — no goodies left, so no "spin again" either
-  const againIdx = GOODIES.findIndex(g=>g.key===AGAIN_KEY);
-  if(againIdx>=0){ pool.push({i:againIdx, weight:AGAIN_WEIGHT}); tot+=AGAIN_WEIGHT; }
+  if(!tot) return null;   // only possible if every real good is out AND the empty wedges were removed
   let r=Math.random()*tot, acc=0, pick=pool[pool.length-1];
   for(const it of pool){ acc+=it.weight; if(r<=acc){ pick=it; break; } }
   return pick.i;
@@ -785,10 +793,12 @@ $('spin').addEventListener('click', async ()=>{
     const idx=localPick();
     if(idx===null){ btn.disabled=true; $('caption').textContent='Plus de cadeaux disponibles pour l\'instant.'; return; }
     const g=GOODIES[idx];
-    if(g.key===AGAIN_KEY){
-      // Not a real prize — don't touch stock, don't mark the player as played, don't record anything.
+    if(g.empty){
+      // No prize — this spin still counts (the player can't just retry), but
+      // nothing is reserved and nothing is sent to the sheet.
+      playedKeys.add(playerKey(currentPlayer));
       $('caption').textContent='La roue tourne…';
-      spinToIndex(idx, spinAgain);
+      spinToIndex(idx, ()=>{ lastWin=idx; loseReveal(idx); });
       return;
     }
     INVENTORY[g.key]=Math.max(0,(INVENTORY[g.key]||0)-1);   // reserve one locally
@@ -799,8 +809,8 @@ $('spin').addEventListener('click', async ()=>{
     spinToIndex(idx, ()=>{ lastWin=idx; reveal(idx); $('caption').textContent='Félicitations !'; });
   } else {
     /* FALLBACK — server decides (only if the login preload failed). The server
-     * doesn't know about the "again" segment, so it only ever returns real
-     * goodies here — spin-again is a fast-path-only feature. */
+     * doesn't know about the "empty" wedges, so it only ever returns real
+     * goodies here — losing is a fast-path-only outcome. */
     $('caption').textContent='Un instant…';
     let data;
     try{ data = await apiCall({action:'play', player:currentPlayer}); }
@@ -820,15 +830,18 @@ $('spin').addEventListener('click', async ()=>{
   }
 });
 
-/* Landed on the bonus "Rejouez" wedge: no prize, no stock/record changes —
- * just let the same player spin again once the wheel settles. */
-function spinAgain(){
-  $('caption').textContent='Rejouez ! Un tour bonus vous attend…';
-  S.shimmer();
-  setTimeout(()=>{
-    $('spin').disabled=false;
-    $('caption').textContent='Tournez pour révéler votre cadeau';
-  }, 1300);
+/* Landed on a "Perdu" wedge: show the same result modal as a win, but in its
+ * lost state — no gift box, no confetti, just an honest "you didn't win". */
+function loseReveal(index){
+  highlight(index,true);
+  const prize=$('prize');
+  prize.classList.remove('revealed');
+  prize.classList.add('lost');
+  $('won-text').textContent='Pas de chance';
+  $('lost-msg').textContent=(currentPlayer ? currentPlayer.prenom+', vous' : 'Vous')+' n\'avez malheureusement rien gagné cette fois.';
+  $('result').classList.add('show');
+  S.tick();
+  setTimeout(()=>{ prize.classList.add('revealed'); }, 300);
 }
 
 /* result → new player */
