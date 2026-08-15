@@ -373,12 +373,25 @@
 <script>
 /* =======================================================================
    CONFIG — set API_URL to your Google Apps Script Web App /exec URL.
-   Animator accounts are stored server-side in Code.gs (USERS array),
-   not here — the page is publicly hosted, so credentials would leak.
    Leave API_URL as 'PASTE...' to run in local DEMO mode (no saving).
    ======================================================================= */
 const API_URL    = 'https://script.google.com/macros/s/AKfycbyDNBRdplEIIRyYL_j6v85bKI95vTU6B3shR6GIfXcvj4u2g5XDxD7M9VbPixZPwAk/exec';
 const WEIGHT_MODE = 'remaining';   // must match Code.gs ('remaining' or 'total')
+
+/* Animator accounts — checked entirely in the browser, these are the only
+ * ones that can log in. Because this page is publicly hosted, anyone who
+ * views its source can read these credentials; only use this for a
+ * low-stakes/internal event login, not anything security-sensitive.
+ * A match here never touches the Code.gs backend's own login — matched
+ * accounts run in a local session (stock starts from DEMO_QTY below and
+ * spins are NOT written to the Google Sheet), since the fake local token
+ * they get would be rejected by the real backend as unauthorized. */
+const LOCAL_ACCOUNTS = {
+  'Mytek':      'my.tek20',
+  'Tunisianet': 'tunisia_net27',
+  'Spacenet':   'space.bek0',
+  'Admin':      'admin.2027'
+};
 
 const GOODIES = [{"key": "tote", "name": "Tote Bag", "sub": "Le sac en toile Blue Days"}, {"key": "empty1", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "cap", "name": "Casquette", "sub": "La casquette brodée beko"}, {"key": "empty2", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "mug", "name": "Mug", "sub": "Le mug beko à emporter"}, {"key": "empty3", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "visor", "name": "Pare-soleil", "sub": "Le pare-soleil réfléchissant"}, {"key": "empty4", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "opener", "name": "Ouvre-bouteille", "sub": "Magnet & ouvre-bouteille"}, {"key": "empty5", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}];
 const EMPTY_WEIGHT = 200;   // fixed odds per "Perdu" wedge — losing doesn't consume any stock
@@ -570,7 +583,12 @@ function reveal(index){
 const AUTH_KEY='beko_auth_v1';
 function loadAuth(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY))||null; }catch(e){ return null; } }
 function saveAuth(a){ try{ a ? localStorage.setItem(AUTH_KEY, JSON.stringify(a)) : localStorage.removeItem(AUTH_KEY); }catch(e){} }
-let auth = loadAuth();   // { token, username, label }
+let auth = loadAuth();   // { token, username, label, local? }
+
+// True when there's no real backend session to talk to — either DEMO mode
+// (no API_URL) or a LOCAL_ACCOUNTS login, whose token the real Code.gs
+// backend would reject. Both cases skip every network call.
+function offlineMode(){ return DEMO || !!(auth && auth.local); }
 
 async function postJSON(payload){
   const res = await fetch(API_URL, {
@@ -594,7 +612,7 @@ function handleSessionExpired(){
 
 /* load stock + already-played players once, right after login */
 async function loadInit(){
-  if(DEMO){ INVENTORY={}; GOODIES.forEach(g=>INVENTORY[g.key]=DEMO_QTY[g.key]||100); return true; }
+  if(offlineMode()){ INVENTORY={}; GOODIES.forEach(g=>INVENTORY[g.key]=DEMO_QTY[g.key]||100); return true; }
   try{
     const data = await apiCall({action:'init'});
     if(data && data.ok){
@@ -610,7 +628,7 @@ async function loadInit(){
 
 /* refresh stock between players (non-blocking) when everything is synced */
 async function refreshStock(){
-  if(DEMO || !INVENTORY || pending.length || !auth) return;
+  if(offlineMode() || !INVENTORY || pending.length || !auth) return;
   try{
     const data = await apiCall({action:'init'});
     if(data && data.ok){
@@ -632,7 +650,7 @@ let flushing=false;
 function updateSyncBadge(){ /* silent — no dev UI shown to players */ }
 function queueRecord(rec){ pending.push(rec); savePending(pending); updateSyncBadge(); flushPending(); }
 async function flushPending(){
-  if(flushing || DEMO || !pending.length) return;
+  if(flushing || offlineMode() || !pending.length) return;
   flushing=true;
   while(pending.length){
     const rec=pending[0];
@@ -682,18 +700,17 @@ $('btn-login').addEventListener('click', async ()=>{
   const original=btn.textContent; btn.innerHTML='<span class="spinner"></span>Connexion…';
   $('login-msg').textContent='';
   try{
-    if(DEMO){
+    const localName = Object.keys(LOCAL_ACCOUNTS).find(n => n.toLowerCase()===u.toLowerCase());
+    if(localName && LOCAL_ACCOUNTS[localName]===p){
+      auth = { token:'local-'+localName.toLowerCase(), username:localName, label:localName, local:true };
+    } else if(DEMO){
       // demo: accept any non-empty credentials so the layout can be previewed offline
       auth={ token:'demo', username:u, label:u };
     } else {
-      const data = await postJSON({action:'login', username:u, password:p});
-      if(!data || !data.ok){
-        auth=null; saveAuth(null);
-        const m=$('login-msg'); m.className='notice err';
-        m.textContent = (data && data.error==='bad_credentials') ? 'Identifiant ou mot de passe incorrect.' : 'Connexion impossible. Réessayez.';
-        btn.disabled=false; btn.textContent=original; return;
-      }
-      auth={ token:data.token, username:data.username, label:data.label||data.username };
+      auth=null; saveAuth(null);
+      const m=$('login-msg'); m.className='notice err';
+      m.textContent='Identifiant ou mot de passe incorrect.';
+      btn.disabled=false; btn.textContent=original; return;
     }
     saveAuth(auth);
     $('p').value='';
@@ -708,13 +725,13 @@ $('btn-login').addEventListener('click', async ()=>{
 });
 $('p').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btn-login').click(); });
 $('logout').addEventListener('click', async ()=>{
-  const tok = auth && auth.token;
+  const tok = auth && auth.token, wasOffline = DEMO || !!(auth && auth.local);
   currentPlayer=null; auth=null; saveAuth(null);
   $('u').value=''; $('p').value=''; updateAnimatorTag();
   // clear in-memory session data so a different animator on the same tablet starts fresh
   INVENTORY=null; playedKeys.clear();
   showScreen('screen-login');
-  if(tok && !DEMO) { try{ await postJSON({action:'logout', token:tok}); }catch(e){} }
+  if(tok && !wasOffline) { try{ await postJSON({action:'logout', token:tok}); }catch(e){} }
 });
 function updateAnimatorTag(){
   const tag=$('animator-tag');
@@ -804,7 +821,7 @@ $('spin').addEventListener('click', async ()=>{
     INVENTORY[g.key]=Math.max(0,(INVENTORY[g.key]||0)-1);   // reserve one locally
     playedKeys.add(playerKey(currentPlayer));
     // capture the token at spin time so the sheet always credits the animator who ran this spin
-    if(!DEMO) queueRecord({player:currentPlayer, key:g.key, token: auth && auth.token});
+    if(!offlineMode()) queueRecord({player:currentPlayer, key:g.key, token: auth && auth.token});
     $('caption').textContent='La roue tourne…';
     spinToIndex(idx, ()=>{ lastWin=idx; reveal(idx); $('caption').textContent='Félicitations !'; });
   } else {
