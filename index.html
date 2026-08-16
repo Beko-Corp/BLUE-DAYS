@@ -375,7 +375,7 @@
    CONFIG — set API_URL to your Google Apps Script Web App /exec URL.
    Leave API_URL as 'PASTE...' to run in local DEMO mode (no saving).
    ======================================================================= */
-const API_URL    = 'https://script.google.com/macros/s/AKfycbyuFPVq1P4sJs8KBqr5gHeguY1kcOXmNu1dBlafzGPOcm_lumwkpg6LcIGnsXCnEnA/exec';
+const API_URL    = 'https://script.google.com/macros/s/AKfycbxpz38h2YqUEKjtffCzs8U06gZu2FTMhWIAwHx_YQwVbNZFzMILesRFlKQrIuGIyHY/exec';
 const WEIGHT_MODE = 'remaining';   // must match Code.gs ('remaining' or 'total')
 
 /* Animator accounts are stored server-side in Code.gs (USERS array),
@@ -383,7 +383,6 @@ const WEIGHT_MODE = 'remaining';   // must match Code.gs ('remaining' or 'total'
  * To add or rename accounts, edit USERS in Code.gs and redeploy. */
 
 const GOODIES = [{"key": "tote", "name": "Tote Bag", "sub": "Le sac en toile Blue Days"}, {"key": "empty1", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "cap", "name": "Casquette", "sub": "La casquette brodée beko"}, {"key": "empty2", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "mug", "name": "Mug", "sub": "Le mug beko à emporter"}, {"key": "empty3", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "visor", "name": "Pare-soleil", "sub": "Le pare-soleil réfléchissant"}, {"key": "empty4", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}, {"key": "opener", "name": "Ouvre-bouteille", "sub": "Magnet & ouvre-bouteille"}, {"key": "empty5", "name": "Perdu", "sub": "Pas de chance, retentez une prochaine fois", "empty": true}];
-const EMPTY_WEIGHT = 200;   // fixed odds per "Perdu" wedge — losing doesn't consume any stock
 const TN_MAP  = {"Ariana": ["Ariana Ville", "Ettadhamen", "Kalaat Landlous", "La Soukra", "Mnihla", "Raoued", "Sidi Thabet"], "Beja": ["Amdoun", "Beja Nord", "Beja Sud", "Goubellat", "Mejez El Bab", "Nefza", "Teboursouk", "Testour", "Thibar"], "Ben Arous": ["Ben Arous", "Bou Mhel El Bassatine", "El Mourouj", "Ezzahra", "Fouchana", "Hammam Chatt", "Hammam Lif", "Megrine", "Mohamadia", "Mornag", "Nouvelle Medina", "Rades"], "Bizerte": ["Bizerte Nord", "Bizerte Sud", "El Alia", "Ghar El Melh", "Ghezala", "Jarzouna", "Joumine", "Mateur", "Menzel Bourguiba", "Menzel Jemil", "Ras Jebel", "Sejnane", "Tinja", "Utique"], "Gabes": ["El Hamma", "El Metouia", "Gabes Medina", "Gabes Ouest", "Gabes Sud", "Ghannouche", "Mareth", "Matmata", "Menzel Habib", "Nouvelle Matmata"], "Gafsa": ["Belkhir", "El Guettar", "El Ksar", "El Mdhilla", "Gafsa Nord", "Gafsa Sud", "Metlaoui", "Moulares", "Redeyef", "Sidi Aich", "Sned"], "Jendouba": ["Ain Draham", "Balta Bou Aouene", "Bou Salem", "Fernana", "Ghardimaou", "Jendouba", "Jendouba Nord", "Oued Mliz", "Tabarka"], "Kairouan": ["Bou Hajla", "Chebika", "Cherarda", "El Ala", "Haffouz", "Hajeb El Ayoun", "Kairouan Nord", "Kairouan Sud", "Nasrallah", "Oueslatia", "Sbikha"], "Kasserine": ["El Ayoun", "Ezzouhour  (Kasserine)", "Feriana", "Foussana", "Haidra", "Hassi El Frid", "Jediliane", "Kasserine Nord", "Kasserine Sud", "Mejel Bel Abbes", "Sbeitla", "Sbiba", "Thala"], "Kebili": ["Douz", "El Faouar", "Kebili Nord", "Kebili Sud", "Souk El Ahad"], "Kef": ["Dahmani", "El Ksour", "Jerissa", "Kalaa El Khasba", "Kalaat Sinane", "Le Kef Est", "Le Kef Ouest", "Le Sers", "Nebeur", "Sakiet Sidi Youssef", "Tajerouine", "Touiref"], "Mahdia": ["Bou Merdes", "Chorbane", "El Jem", "Hbira", "Ksour Essaf", "La Chebba", "Mahdia", "Melloulech", "Ouled Chamakh", "Sidi Alouene", "Souassi"], "Mannouba": ["Borj El Amri", "Douar Hicher", "El Battan", "Jedaida", "Mannouba", "Mornaguia", "Oued Ellil", "Tebourba"], "Medenine": ["Ajim", "Ben Guerdane", "Beni Khedache", "Houmet Essouk", "Medenine Nord", "Medenine Sud", "Midoun", "Sidi Makhlouf", "Zarzis"], "Monastir": ["Bekalta", "Bembla", "Beni Hassen", "Jemmal", "Ksar Helal", "Ksibet El Mediouni", "Moknine", "Monastir", "Ouerdanine", "Sahline", "Sayada Lamta Bou Hajar", "Teboulba", "Zeramdine"], "Nabeul": ["Beni Khalled", "Beni Khiar", "Bou Argoub", "Dar Chaabane Elfehri", "El Haouaria", "El Mida", "Grombalia", "Hammam El Ghezaz", "Hammamet", "Kelibia", "Korba", "Menzel Bouzelfa", "Menzel Temime", "Nabeul", "Soliman", "Takelsa"], "Sfax": ["Agareb", "Bir Ali Ben Khelifa", "El Amra", "El Hencha", "Esskhira", "Ghraiba", "Jebeniana", "Kerkenah", "Mahras", "Menzel Chaker", "Sakiet Eddaier", "Sakiet Ezzit", "Sfax Est", "Sfax Sud", "Sfax Ville"], "Sidi Bouzid": ["Ben Oun", "Bir El Haffey", "Cebbala", "Jilma", "Maknassy", "Menzel Bouzaiene", "Mezzouna", "Ouled Haffouz", "Regueb", "Sidi Bouzid Est", "Sidi Bouzid Ouest", "Souk Jedid"], "Siliana": ["Bargou", "Bou Arada", "El Aroussa", "Gaafour", "Kesra", "Le Krib", "Makthar", "Rohia", "Sidi Bou Rouis", "Siliana Nord", "Siliana Sud"], "Sousse": ["Akouda", "Bou Ficha", "Enfidha", "Hammam Sousse", "Hergla", "Kalaa El Kebira", "Kalaa Essghira", "Kondar", "Msaken", "Sidi Bou Ali", "Sidi El Heni", "Sousse Jaouhara", "Sousse Riadh", "Sousse Ville"], "Tataouine": ["Bir Lahmar", "Dhehiba", "Ghomrassen", "Remada", "Smar", "Tataouine Nord", "Tataouine Sud"], "Tozeur": ["Degueche", "Hezoua", "Nefta", "Tameghza", "Tozeur"], "Tunis": ["Bab Bhar", "Bab Souika", "Carthage", "Cite El Khadra", "El Hrairia", "El Kabbaria", "El Kram", "El Menzah", "El Omrane", "El Omrane Superieur", "El Ouerdia", "Essijoumi", "Ettahrir", "Ezzouhour  (Tunis)", "Jebel Jelloud", "La Goulette", "La Marsa", "La Medina", "Le Bardo", "Sidi El Bechir", "Sidi Hassine"], "Zaghouan": ["Bir Mcherga", "El Fahs", "Ennadhour", "Hammam Zriba", "Saouef", "Zaghouan"]};
 
 const DEMO = !API_URL || API_URL.indexOf('PASTE_') === 0;
@@ -401,8 +400,12 @@ const NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 function polar(r,deg){const a=(deg-90)*Math.PI/180;return [CX+r*Math.cos(a),CY+r*Math.sin(a)];}
 
-/* ---- in-memory state (loaded once at login) ---- */
-let INVENTORY = null;                // {key: remaining}  — null means "not loaded, use server fallback"
+/* ---- in-memory state (loaded once at login, refreshed between players) ---- */
+let STOCK = null;   // { key: {remaining, dailyBudget, budgetLeft} } — null = not loaded (server fallback)
+let ODDS  = { perduMax:0.90, perduFloor:0.05 };   // overwritten by the server at init
+const EMPTY_KEYS = GOODIES.filter(g=>g.empty).map(g=>g.key);
+const NUM_EMPTY  = Math.max(1, EMPTY_KEYS.length);
+const PERDU_KEY  = 'perdu';   // marker sent to the sheet for a losing spin
 const playedKeys = new Set();        // normalized "prenom|nom" of everyone who already played
 let currentPlayer = null;
 
@@ -598,31 +601,39 @@ function handleSessionExpired(){
   showScreen('screen-login');
 }
 
-/* load stock + already-played players once, right after login */
+/* load stock + odds params + already-played players once, right after login */
+function buildDemoStock(){
+  const s={}; GOODIES.filter(g=>!g.empty).forEach(g=>{
+    const rem=DEMO_QTY[g.key]||100, daily=rem/28/3;
+    s[g.key]={remaining:rem, dailyBudget:daily, budgetLeft:daily};
+  }); return s;
+}
+function applyInit(data){
+  STOCK={};
+  GOODIES.filter(g=>!g.empty).forEach(g=>{
+    const s=data.stock && data.stock[g.key];
+    STOCK[g.key] = s ? {remaining:Math.max(0,s.remaining), dailyBudget:Math.max(0,s.dailyBudget||0), budgetLeft:Math.max(0,s.budgetLeft||0)}
+                     : {remaining:0, dailyBudget:0, budgetLeft:0};
+  });
+  if(data.params){ ODDS={ perduMax:data.params.perduMax, perduFloor:data.params.perduFloor }; }
+  (data.players||[]).forEach(k=>playedKeys.add(k));
+}
 async function loadInit(){
-  if(offlineMode()){ INVENTORY={}; GOODIES.forEach(g=>INVENTORY[g.key]=DEMO_QTY[g.key]||100); return true; }
+  if(offlineMode()){ STOCK=buildDemoStock(); return true; }
   try{
     const data = await apiCall({action:'init'});
-    if(data && data.ok){
-      INVENTORY={};
-      GOODIES.forEach(g=>{ const s=data.stock && data.stock[g.key]; INVENTORY[g.key]= s ? Math.max(0,s.remaining) : 0; });
-      (data.players||[]).forEach(k=>playedKeys.add(k));
-      return true;
-    }
+    if(data && data.ok){ applyInit(data); return true; }
   }catch(e){}
-  INVENTORY=null;   // fallback: spins will ask the server to pick (slower)
+  STOCK=null;   // fallback: spins will ask the server to pick (slower)
   return false;
 }
 
 /* refresh stock between players (non-blocking) when everything is synced */
 async function refreshStock(){
-  if(offlineMode() || !INVENTORY || pending.length || !auth) return;
+  if(offlineMode() || !STOCK || pending.length || !auth) return;
   try{
     const data = await apiCall({action:'init'});
-    if(data && data.ok){
-      GOODIES.forEach(g=>{ const s=data.stock && data.stock[g.key]; if(s) INVENTORY[g.key]=Math.max(0,s.remaining); });
-      (data.players||[]).forEach(k=>playedKeys.add(k));
-    }
+    if(data && data.ok){ applyInit(data); }
   }catch(e){}
 }
 
@@ -659,20 +670,38 @@ async function flushPending(){
 setInterval(flushPending, 8000);
 addEventListener('online', flushPending);
 
-/* ---- local weighted pick (instant) ---- */
+/* ---- local weighted pick (instant) — mirrors computeWeights_ in Code.gs ----
+   Goodie weight = how much of this store's daily budget for that goodie is left
+   today; as budgets deplete the "Perdu" share climbs toward ODDS.perduMax. */
+function computeWeights(){
+  const perduMax=ODDS.perduMax, perduFloor=ODDS.perduFloor;
+  let P=0, B=0; const g={};
+  GOODIES.filter(x=>!x.empty).forEach(x=>{
+    const s=STOCK[x.key]; if(!s) return;
+    if(s.remaining>0){ B+=s.dailyBudget; if(s.budgetLeft>0) P+=s.budgetLeft; }
+  });
+  const u = (B<=0) ? 1 : Math.min(1, Math.max(0, 1 - P/B));
+  const perduProb = Math.min(perduMax, Math.max(perduFloor, perduMax*u));
+  let perduWeight;
+  if(P>0){
+    GOODIES.filter(x=>!x.empty).forEach(x=>{ const s=STOCK[x.key]; if(s && s.remaining>0 && s.budgetLeft>0) g[x.key]=s.budgetLeft; });
+    perduWeight = P * perduProb/(1-perduProb);
+  } else {
+    let R=0; GOODIES.filter(x=>!x.empty).forEach(x=>{ const s=STOCK[x.key]; if(s && s.remaining>0) R+=s.remaining; });
+    if(R>0){ GOODIES.filter(x=>!x.empty).forEach(x=>{ const s=STOCK[x.key]; if(s && s.remaining>0) g[x.key]=s.remaining; });
+             perduWeight = R * (perduMax/(1-perduMax)); }
+    else { perduWeight = 1; }
+  }
+  return { goodie:g, perdu:perduWeight };
+}
 function localPick(){
+  const cw=computeWeights();
   const pool=[]; let tot=0;
   GOODIES.forEach((g,i)=>{
-    let weight;
-    if(g.empty){
-      weight = EMPTY_WEIGHT;   // fixed odds, not tied to any stock
-    }else{
-      const rem = INVENTORY[g.key]||0;
-      weight = rem>0 ? ((WEIGHT_MODE==='total') ? (DEMO?DEMO_QTY[g.key]:rem) : rem) : 0;   // 'total' uses original qty
-    }
+    let weight = g.empty ? (cw.perdu / NUM_EMPTY) : (cw.goodie[g.key]||0);
     if(weight>0){ pool.push({i,weight}); tot+=weight; }
   });
-  if(!tot) return null;   // only possible if every real good is out AND the empty wedges were removed
+  if(!tot) return null;
   let r=Math.random()*tot, acc=0, pick=pool[pool.length-1];
   for(const it of pool){ acc+=it.weight; if(r<=acc){ pick=it; break; } }
   return pick.i;
@@ -718,7 +747,7 @@ $('logout').addEventListener('click', async ()=>{
   currentPlayer=null; auth=null; saveAuth(null);
   $('u').value=''; $('p').value=''; updateAnimatorTag();
   // clear in-memory session data so a different animator on the same tablet starts fresh
-  INVENTORY=null; playedKeys.clear();
+  STOCK=null; playedKeys.clear();
   showScreen('screen-login');
   if(tok && !DEMO) { try{ await postJSON({action:'logout', token:tok}); }catch(e){} }
 });
@@ -794,29 +823,27 @@ $('spin').addEventListener('click', async ()=>{
   if(lastWin>=0){ highlight(lastWin,false); lastWin=-1; }
   const btn=$('spin'); btn.disabled=true;
 
-  if(INVENTORY){
+  if(STOCK){
     /* FAST PATH — decide locally, spin immediately, record in the background */
     const idx=localPick();
     if(idx===null){ btn.disabled=true; $('caption').textContent='Plus de cadeaux disponibles pour l\'instant.'; return; }
     const g=GOODIES[idx];
+    playedKeys.add(playerKey(currentPlayer));
     if(g.empty){
-      // No prize — this spin still counts (the player can't just retry), but
-      // nothing is reserved and nothing is sent to the sheet.
-      playedKeys.add(playerKey(currentPlayer));
+      // No prize — but the spin still counts and is now saved to the sheet as "Perdu".
+      if(!offlineMode()) queueRecord({player:currentPlayer, key:PERDU_KEY, token: auth && auth.token});
       $('caption').textContent='La roue tourne…';
       spinToIndex(idx, ()=>{ lastWin=idx; loseReveal(idx); });
       return;
     }
-    INVENTORY[g.key]=Math.max(0,(INVENTORY[g.key]||0)-1);   // reserve one locally
-    playedKeys.add(playerKey(currentPlayer));
+    const s=STOCK[g.key]; if(s){ s.remaining=Math.max(0,s.remaining-1); s.budgetLeft=Math.max(0,s.budgetLeft-1); }  // reserve locally
     // capture the token at spin time so the sheet always credits the animator who ran this spin
     if(!offlineMode()) queueRecord({player:currentPlayer, key:g.key, token: auth && auth.token});
     $('caption').textContent='La roue tourne…';
     spinToIndex(idx, ()=>{ lastWin=idx; reveal(idx); $('caption').textContent='Félicitations !'; });
   } else {
-    /* FALLBACK — server decides (only if the login preload failed). The server
-     * doesn't know about the "empty" wedges, so it only ever returns real
-     * goodies here — losing is a fast-path-only outcome. */
+    /* FALLBACK — server decides (only if the login preload failed). It applies the
+     * same daily-budget odds and can return a "perdu" (losing) result too. */
     $('caption').textContent='Un instant…';
     let data;
     try{ data = await apiCall({action:'play', player:currentPlayer}); }
@@ -828,9 +855,15 @@ $('spin').addEventListener('click', async ()=>{
       else { btn.disabled=false; $('caption').textContent='Une erreur est survenue. Réessayez.'; }
       return;
     }
+    playedKeys.add(playerKey(currentPlayer));
+    if(data.perdu || data.key===PERDU_KEY){
+      const idx=GOODIES.findIndex(x=>x.empty);
+      $('caption').textContent='La roue tourne…';
+      spinToIndex(idx, ()=>{ lastWin=idx; loseReveal(idx); });
+      return;
+    }
     const idx=GOODIES.findIndex(x=>x.key===data.key);
     if(idx<0){ btn.disabled=false; $('caption').textContent='Une erreur est survenue. Réessayez.'; return; }
-    playedKeys.add(playerKey(currentPlayer));
     $('caption').textContent='La roue tourne…';
     spinToIndex(idx, ()=>{ lastWin=idx; reveal(idx); $('caption').textContent='Félicitations !'; });
   }
