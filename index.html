@@ -73,6 +73,42 @@
   .notice{min-height:18px;font-size:13px;margin:6px 0 2px;font-weight:600;}
   .notice.err{color:var(--bad);} .notice.ok{color:var(--ok);}
 
+  /* --- login: formal store list + password step --- */
+  .store-list{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+  .store-row{
+    display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;column-gap:14px;
+    align-items:center;text-align:left;
+    padding:14px 18px;min-height:64px;cursor:pointer;font-family:inherit;color:var(--bone);
+    background:rgba(7,20,44,.55);
+    border:1px solid rgba(200,162,74,.28);border-radius:12px;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .store-row:hover  { border-color:var(--brass); background:rgba(11,28,60,.75); }
+  .store-row:active { transform:translateY(1px); }
+  .store-row:focus-visible{outline:2px solid var(--brass-bright);outline-offset:2px;}
+  .store-row .s-name{grid-column:1;grid-row:1;font-size:17px;font-weight:700;letter-spacing:.01em;color:var(--bone);}
+  .store-row .s-hint{grid-column:1;grid-row:2;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:rgba(232,205,130,.62);font-weight:600;margin-top:2px;}
+  .store-row .s-chev{grid-column:2;grid-row:1 / span 2;font-size:22px;color:rgba(232,205,130,.55);font-weight:400;line-height:1;
+    transition:transform .15s ease, color .15s ease;}
+  .store-row:hover .s-chev{color:var(--brass-bright);transform:translateX(2px);}
+
+  .store-summary{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:14px 16px;margin:6px 0 16px;border-radius:12px;
+    background:rgba(7,20,44,.55);border:1px solid rgba(200,162,74,.28);
+  }
+  .store-summary .s-eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:700;}
+  .store-summary .s-title{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--bone);line-height:1.15;margin-top:2px;}
+  .link-btn{
+    background:none;border:1px solid rgba(200,162,74,.35);color:var(--brass-bright);
+    font:inherit;font-weight:600;font-size:13px;letter-spacing:.02em;
+    padding:8px 14px;border-radius:999px;cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .link-btn:hover{border-color:var(--brass);background:rgba(11,28,60,.6);}
+  .link-btn:focus-visible{outline:2px solid var(--brass-bright);outline-offset:2px;}
+
   .btn{font-family:Georgia,serif;font-size:18px;font-weight:700;letter-spacing:.06em;color:var(--ink);cursor:pointer;
     border:none;border-radius:999px;padding:16px 34px;width:100%;margin-top:8px;min-height:58px;
     background:linear-gradient(180deg,var(--brass-bright),var(--brass) 55%,var(--brass-deep));
@@ -192,13 +228,46 @@
 <!-- ============ LOGIN ============ -->
 <section class="screen center on" id="screen-login">
   <div class="card">
-    <div class="eyebrow">La roue des goodies</div>
-    <h1>Connexion</h1>
-    <p class="lead">Chaque animateur se connecte avec son propre identifiant.</p>
-    <div class="field"><label for="u">Identifiant</label><input id="u" autocomplete="username" placeholder="username"></div>
-    <div class="field"><label for="p">Mot de passe</label><input id="p" type="password" autocomplete="current-password" placeholder="password"></div>
-    <div class="notice" id="login-msg"></div>
-    <button class="btn" id="btn-login">Se connecter</button>
+    <!-- Step 1: choose store -->
+    <div id="login-step-pick">
+      <div class="eyebrow">Espace animateur</div>
+      <h1>Sélection du point de vente</h1>
+      <p class="lead">Veuillez sélectionner votre point de vente pour accéder à la session.</p>
+      <div class="store-list" id="store-grid" role="list">
+        <button type="button" class="store-row" data-user="Mytek"      role="listitem">
+          <span class="s-name">Mytek</span>
+          <span class="s-hint">Point de vente</span>
+          <span class="s-chev" aria-hidden="true">›</span>
+        </button>
+        <button type="button" class="store-row" data-user="Tunisianet" role="listitem">
+          <span class="s-name">Tunisianet</span>
+          <span class="s-hint">Point de vente</span>
+          <span class="s-chev" aria-hidden="true">›</span>
+        </button>
+        <button type="button" class="store-row" data-user="Spacenet"   role="listitem">
+          <span class="s-name">Spacenet</span>
+          <span class="s-hint">Point de vente</span>
+          <span class="s-chev" aria-hidden="true">›</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: password for the chosen store -->
+    <div id="login-step-pass" style="display:none">
+      <div class="eyebrow">Authentification</div>
+      <h1>Accès sécurisé</h1>
+      <div class="store-summary">
+        <div>
+          <div class="s-eyebrow">Point de vente</div>
+          <div class="s-title" id="pass-title">—</div>
+        </div>
+        <button type="button" class="link-btn" id="back-to-pick">Changer</button>
+      </div>
+      <div class="field"><label for="p">Mot de passe</label>
+        <input id="p" type="password" autocomplete="current-password" placeholder="Saisir le mot de passe"></div>
+      <div class="notice" id="login-msg"></div>
+      <button class="btn" id="btn-login">Valider</button>
+    </div>
   </div>
 </section>
 
@@ -708,24 +777,45 @@ function localPick(){
 }
 
 /* ---- LOGIN ---- */
+/* ---- LOGIN ---- */
+let pickedUser = null;
+
+function goPickStep(){
+  pickedUser = null;
+  $('login-step-pass').style.display='none';
+  $('login-step-pick').style.display='';
+  $('p').value=''; const m=$('login-msg'); m.textContent=''; m.className='notice';
+}
+function goPassStep(user){
+  pickedUser = { user };
+  $('pass-title').textContent = user;
+  $('login-step-pick').style.display='none';
+  $('login-step-pass').style.display='';
+  setTimeout(()=>$('p').focus(), 30);
+}
+
+document.querySelectorAll('#store-grid .store-row').forEach(btn=>{
+  btn.addEventListener('click', ()=> goPassStep(btn.dataset.user));
+});
+$('back-to-pick').addEventListener('click', goPickStep);
+
 $('btn-login').addEventListener('click', async ()=>{
-  const u=$('u').value.trim(), p=$('p').value;
-  if(!u || !p){
-    const m=$('login-msg'); m.className='notice err'; m.textContent='Renseignez identifiant et mot de passe.'; return;
-  }
+  if(!pickedUser){ goPickStep(); return; }
+  const u = pickedUser.user, p = $('p').value;
+  if(!p){ const m=$('login-msg'); m.className='notice err'; m.textContent='Entrez le mot de passe.'; return; }
   const btn=$('btn-login'); btn.disabled=true;
   const original=btn.textContent; btn.innerHTML='<span class="spinner"></span>Connexion…';
   $('login-msg').textContent='';
   try{
     if(DEMO){
-      // demo: accept any non-empty credentials so the layout can be previewed offline
+      // demo: accept any password so the layout can be previewed offline
       auth={ token:'demo', username:u, label:u };
     } else {
       const data = await postJSON({action:'login', username:u, password:p});
       if(!data || !data.ok){
         auth=null; saveAuth(null);
         const m=$('login-msg'); m.className='notice err';
-        m.textContent = (data && data.error==='bad_credentials') ? 'Identifiant ou mot de passe incorrect.' : 'Connexion impossible. Réessayez.';
+        m.textContent = (data && data.error==='bad_credentials') ? 'Mot de passe incorrect.' : 'Connexion impossible. Réessayez.';
         btn.disabled=false; btn.textContent=original; return;
       }
       auth={ token:data.token, username:data.username, label:data.label||data.username };
@@ -745,9 +835,10 @@ $('p').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btn-login').click(
 $('logout').addEventListener('click', async ()=>{
   const tok = auth && auth.token;
   currentPlayer=null; auth=null; saveAuth(null);
-  $('u').value=''; $('p').value=''; updateAnimatorTag();
+  updateAnimatorTag();
   // clear in-memory session data so a different animator on the same tablet starts fresh
   STOCK=null; playedKeys.clear();
+  goPickStep();
   showScreen('screen-login');
   if(tok && !DEMO) { try{ await postJSON({action:'logout', token:tok}); }catch(e){} }
 });
