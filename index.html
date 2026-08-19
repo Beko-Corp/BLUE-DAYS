@@ -39,6 +39,7 @@
   .topbtn.show{display:inline-flex;}
   #mute{right:16px;width:36px;padding:0;justify-content:center;}
   #logout{right:60px;}
+  #back-to-choice{left:16px;}
   .topbtn:focus-visible{outline:2px solid var(--brass-bright);outline-offset:2px;}
 
   .screen{position:fixed;inset:0;z-index:2;display:none;flex-direction:column;align-items:center;
@@ -54,6 +55,28 @@
   .eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass);font-weight:700;}
   .card h1{font-family:Georgia,"Times New Roman",serif;font-size:26px;font-weight:700;color:var(--bone);margin:8px 0 4px;}
   .card p.lead{font-size:13px;color:rgba(244,239,226,.72);margin-bottom:18px;}
+  .card.card-wide{width:min(96vw,640px);}
+  .dice-legend{display:flex;flex-direction:column;gap:10px;margin:16px 0 20px;}
+  .legend-row{display:flex;align-items:center;justify-content:center;gap:16px;
+    padding:12px 16px;border-radius:14px;background:rgba(7,20,44,.5);border:1px solid rgba(200,162,74,.25);}
+  .legend-row.jackpot{background:linear-gradient(180deg,rgba(60,40,0,.55),rgba(30,20,0,.4));border-color:rgba(232,205,130,.6);
+    box-shadow:0 0 0 1px rgba(232,205,130,.15), 0 8px 22px rgba(0,0,0,.35);}
+  .legend-dice{display:flex;gap:6px;align-items:center;flex:0 0 auto;}
+  .mini-die{width:32px;height:32px;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+    padding:5px;gap:1px;background:linear-gradient(180deg,#2a4b8f,#12285e);box-shadow:inset 0 -3px 6px rgba(0,0,0,.35),0 3px 7px rgba(0,0,0,.4);}
+  .mini-die.dark{background:linear-gradient(180deg,#1a1a24,#08080e);}
+  .mini-die .mp{border-radius:50%;background:#f5f0e4;align-self:center;justify-self:center;width:64%;aspect-ratio:1;visibility:hidden;}
+  .legend-arrow{color:var(--brass-bright);font-size:18px;font-weight:700;text-align:center;line-height:1;flex:0 0 auto;}
+  .legend-gift{display:flex;align-items:center;gap:12px;text-align:left;flex:1 1 auto;min-width:0;}
+  .legend-gift .lg-icon{width:56px;height:56px;flex:0 0 auto;filter:drop-shadow(0 3px 6px rgba(0,0,0,.45));}
+  .legend-gift .lg-icon svg{width:100%;height:100%;}
+  .legend-gift .lg-name{display:block;font-family:Georgia,serif;font-weight:700;font-size:17px;color:var(--bone);line-height:1.15;}
+  .legend-gift .lg-sub{display:none;}
+  .legend-row.jackpot .lg-name{color:var(--brass-bright);}
+  .lg-pack{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-top:4px;}
+  .lg-pack svg{width:28px;height:28px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
+  .lg-badge{display:inline-block;font-size:9px;letter-spacing:.15em;text-transform:uppercase;font-weight:800;color:#1a1305;
+    background:linear-gradient(180deg,var(--brass-bright),var(--brass));border-radius:999px;padding:2px 8px;margin-left:2px;vertical-align:middle;}
 
   .field{margin-bottom:16px;text-align:left;}
   .field label{display:block;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);font-weight:700;margin-bottom:8px;}
@@ -127,6 +150,42 @@
   .g-title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(22px,3.4vw,34px);font-weight:700;color:var(--bone);text-align:center;margin-bottom:16px;}
 
   .wheel-wrap{position:relative;width:min(88vw,min(62vh,620px));aspect-ratio:1;}
+
+  /* --- game choice screen --- */
+  .game-choice{display:grid;grid-template-columns:1fr;gap:12px;margin-top:6px;}
+  @media (min-width:520px){ .game-choice{grid-template-columns:1fr 1fr;gap:14px;} }
+  .game-tile{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    padding:26px 16px;min-height:170px;cursor:pointer;font-family:inherit;color:var(--bone);
+    background:rgba(7,20,44,.55);border:1px solid rgba(200,162,74,.28);border-radius:14px;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .game-tile:hover  { border-color:var(--brass); background:rgba(11,28,60,.75); transform:translateY(-1px); }
+  .game-tile:active { transform:translateY(1px); }
+  .game-tile:focus-visible{outline:2px solid var(--brass-bright);outline-offset:2px;}
+  .game-tile .gt-icon{display:flex;align-items:center;justify-content:center;margin-bottom:2px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35));}
+  .game-tile .gt-name{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--bone);}
+  .game-tile .gt-hint{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,205,130,.62);font-weight:600;}
+
+  /* --- dice stage --- */
+  .dice-stage{
+    position:relative;width:min(97vw,min(86vh,1180px));aspect-ratio:5/4;
+    border-radius:22px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(200,162,74,.35);
+    background:#071a3f;
+  }
+  #dice-scene{width:100%;height:100%;display:block;touch-action:none;cursor:grab;}
+  #dice-scene:active{cursor:grabbing;}
+  .dice-view-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:3;
+    font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,239,226,.6);
+    background:rgba(4,11,28,.4);padding:5px 12px;border-radius:999px;pointer-events:none;
+    opacity:0;transition:opacity .4s ease;white-space:nowrap;}
+  .dice-view-hint.show{opacity:1;}
+  .dice-reset-view{position:absolute;right:12px;top:12px;z-index:3;width:34px;height:34px;border-radius:50%;
+    border:1px solid rgba(200,162,74,.4);background:rgba(10,23,48,.55);color:var(--brass-bright);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);}
+  .dice-reset-view:hover{border-color:var(--brass);background:rgba(11,28,60,.75);}
+  .dice-reset-view svg{width:17px;height:17px;}
   .pointer{position:absolute;left:50%;top:-3px;transform:translateX(-50%);z-index:4;width:40px;height:48px;
     filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));transform-origin:50% 14%;}
   .pointer.tick{animation:tick .09s ease-out;}
@@ -201,8 +260,12 @@
   .prize .pfrom .beko-mark{font-family:Arial,Helvetica,sans-serif;font-weight:800;color:var(--brass-bright);letter-spacing:-0.5px;font-size:15px;}
   .prize .again{margin-top:22px;}
   .lost-msg{display:none;font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--bone);line-height:1.4;margin:20px 0 4px;}
+  .lost-face{display:none;font-size:76px;line-height:1;margin:10px 0 2px;
+    opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s;
+    filter:drop-shadow(0 10px 18px rgba(0,0,0,.4));}
+  .prize.revealed .lost-face{opacity:1;transform:none;transition-delay:.06s;}
   .prize.lost .gift-stage,.prize.lost .pname,.prize.lost .pgot,.prize.lost .name,.prize.lost .pfrom{display:none;}
-  .prize.lost .lost-msg{display:block;}
+  .prize.lost .lost-msg,.prize.lost .lost-face{display:block;}
 
   #confetti{position:fixed;inset:0;z-index:19;pointer-events:none;}
 
@@ -224,6 +287,7 @@
 <div class="brand"><div class="bk">beko</div><div class="days">Blue Days</div></div>
 <button class="topbtn" id="logout">Déconnexion</button>
 <button class="topbtn" id="mute" aria-label="Couper le son">♪</button>
+<button class="topbtn" id="back-to-choice">‹ Changer de jeu</button>
 
 <!-- ============ LOGIN ============ -->
 <section class="screen center on" id="screen-login">
@@ -296,7 +360,59 @@
         <button type="button" data-v="Non">Non</button>
       </div></div>
     <div class="notice" id="form-msg"></div>
-    <button class="btn" id="btn-start">Passer à la roue</button>
+    <button class="btn" id="btn-start">Continuer</button>
+  </div>
+</section>
+
+<!-- ============ GAME CHOICE ============ -->
+<section class="screen center" id="screen-choice">
+  <div class="card">
+    <div class="eyebrow">Choix du jeu</div>
+    <h1>Choisissez votre jeu</h1>
+    <p class="lead" id="choice-lead">Deux jeux, mêmes chances de gagner. À vous de tenter votre chance.</p>
+    <div class="game-choice">
+      <button type="button" class="game-tile" data-game="wheel">
+        <span class="gt-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="52" height="52">
+            <defs><radialGradient id="gtRimW" cx="50%" cy="35%" r="65%">
+              <stop offset="0" stop-color="#f2dda0"/><stop offset=".5" stop-color="#c8a24a"/><stop offset="1" stop-color="#6f5518"/>
+            </radialGradient></defs>
+            <circle cx="32" cy="32" r="28" fill="url(#gtRimW)"/>
+            <circle cx="32" cy="32" r="23" fill="#0a1730"/>
+            <path d="M32 9 L32 32 L52 32 A20 20 0 0 0 32 9 Z" fill="#14306e"/>
+            <path d="M32 32 L52 32 A20 20 0 0 1 41 49 Z" fill="#0b132b"/>
+            <path d="M32 32 L41 49 A20 20 0 0 1 23 49 Z" fill="#14306e"/>
+            <path d="M32 32 L23 49 A20 20 0 0 1 12 32 Z" fill="#0b132b"/>
+            <path d="M32 32 L12 32 A20 20 0 0 1 32 9 Z" fill="#14306e" opacity=".6"/>
+            <circle cx="32" cy="32" r="7" fill="#14306e" stroke="url(#gtRimW)" stroke-width="1.5"/>
+            <path d="M32 3 L28 12 L36 12 Z" fill="#e8cd82" stroke="#5d4715" stroke-width="0.8"/>
+          </svg>
+        </span>
+        <span class="gt-name">La Roue</span>
+        <span class="gt-hint">Tournez pour gagner</span>
+      </button>
+      <button type="button" class="game-tile" data-game="dice">
+        <span class="gt-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="52" height="52">
+            <defs>
+              <linearGradient id="gtDieA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a4b8f"/><stop offset="1" stop-color="#12285e"/></linearGradient>
+              <linearGradient id="gtDieB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1a24"/><stop offset="1" stop-color="#08080e"/></linearGradient>
+            </defs>
+            <g transform="translate(6 12) rotate(-10 15 15)">
+              <rect x="0" y="0" width="30" height="30" rx="6" fill="url(#gtDieA)" stroke="#0a1730" stroke-width="1.2"/>
+              <circle cx="10" cy="10" r="2.4" fill="#f5f0e4"/><circle cx="20" cy="20" r="2.4" fill="#f5f0e4"/>
+            </g>
+            <g transform="translate(28 22) rotate(12 15 15)">
+              <rect x="0" y="0" width="30" height="30" rx="6" fill="url(#gtDieB)" stroke="#000" stroke-width="1.2"/>
+              <circle cx="15" cy="15" r="2.4" fill="#f5f0e4"/><circle cx="8" cy="8" r="2.4" fill="#f5f0e4"/>
+              <circle cx="22" cy="8" r="2.4" fill="#f5f0e4"/><circle cx="8" cy="22" r="2.4" fill="#f5f0e4"/><circle cx="22" cy="22" r="2.4" fill="#f5f0e4"/>
+            </g>
+          </svg>
+        </span>
+        <span class="gt-name">Les Dés</span>
+        <span class="gt-hint">Lancez et faites un double</span>
+      </button>
+    </div>
   </div>
 </section>
 
@@ -426,6 +542,34 @@
   <div class="bar"><button class="btn slim" id="spin">Tourner la roue</button></div>
 </section>
 
+<!-- ============ DICE LEGEND / INTRO ============ -->
+<section class="screen center" id="screen-dice-intro">
+  <div class="card card-wide">
+    <div class="eyebrow">Le jeu de dés</div>
+    <h1>Chaque double, un cadeau</h1>
+    <p class="lead">Lancez les deux dés. Si vous obtenez un <b>double</b>, vous gagnez le cadeau correspondant&nbsp;:</p>
+    <div class="dice-legend" id="dice-legend"><!-- rows injected by JS --></div>
+    <button class="btn" id="dice-intro-go">Lancer les dés</button>
+  </div>
+</section>
+
+<!-- ============ DICE GAME ============ -->
+<section class="screen" id="screen-dice">
+  <div class="animator-tag" id="animator-tag-d" style="display:none"></div>
+  <div class="player-tag" id="player-tag-d"></div>
+  <div class="g-eyebrow">Le jeu de dés</div>
+  <div class="g-title">Lancez les dés &amp; faites un double</div>
+  <div class="dice-stage">
+    <canvas id="dice-scene"></canvas>
+    <button type="button" class="dice-reset-view" id="dice-reset-view" aria-label="Réinitialiser la vue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 3 6.7"/><path d="M3 21v-6h6"/></svg>
+    </button>
+    <div class="dice-view-hint" id="dice-view-hint">Glissez pour tourner · Molette pour zoomer</div>
+  </div>
+  <div class="caption" id="dice-caption">Faites un double pour gagner un cadeau</div>
+  <div class="bar"><button class="btn slim" id="roll">Lancer les dés</button></div>
+</section>
+
 <canvas id="confetti"></canvas>
 
 <!-- ============ RESULT ============ -->
@@ -439,11 +583,15 @@
     <div class="pgot"><span>reçoit</span></div>
     <div class="name" id="prize-name">—</div>
     <div class="pfrom">de la part de <span class="beko-mark">beko</span></div>
+    <div class="lost-face" id="lost-face" aria-hidden="true">🤕</div>
     <div class="lost-msg" id="lost-msg">—</div>
     <button class="btn slim again" id="again">Nouveau joueur</button>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 <script>
 /* =======================================================================
    CONFIG — set API_URL to your Google Apps Script Web App /exec URL.
@@ -492,7 +640,13 @@ function showScreen(id){
   const logged = id!=='screen-login';
   $('logout').classList.toggle('show', logged);
   $('mute').classList.toggle('show', logged);
+  if(id!=='screen-game' && id!=='screen-dice') setBackToChoiceVisible(false);
 }
+function setBackToChoiceVisible(on){ $('back-to-choice').classList.toggle('show', on); }
+$('back-to-choice').addEventListener('click', ()=>{
+  setBackToChoiceVisible(false);
+  showScreen('screen-choice');
+});
 
 /* ---- build wheel ---- */
 function buildWheel(){
@@ -698,7 +852,7 @@ async function loadInit(){
     const data = await apiCall({action:'init'});
     if(data && data.ok){ applyInit(data); return true; }
   }catch(e){}
-  STOCK=null;   // fallback: spins will ask the server to pick (slower)
+  STOCK=null;   // couldn't confirm with the backend
   return false;
 }
 
@@ -768,7 +922,31 @@ function computeWeights(){
   }
   return { goodie:g, perdu:perduWeight };
 }
+
+/* Buyers (achat === 'Oui') are guaranteed a real prize — never "Perdu",
+ * even if a goodie's daily budget or the store's stock has been fully
+ * used up for the day. We weight the pick by remaining stock among the
+ * goodies that still have some; if every real goodie shows 0 remaining
+ * we still hand one out (uniform pick) rather than let a buyer lose. */
+function pickGuaranteedWin(){
+  const real=GOODIES.filter(g=>!g.empty);
+  const inStock=real.filter(g=>STOCK && STOCK[g.key] && STOCK[g.key].remaining>0);
+  const pool=inStock.length ? inStock : real;
+  let tot=0;
+  const weights=pool.map(g=>{
+    const w=(STOCK && STOCK[g.key] && STOCK[g.key].remaining>0) ? STOCK[g.key].remaining : 1;
+    tot+=w; return w;
+  });
+  let r=Math.random()*tot, acc=0, idx=pool.length-1;
+  for(let i=0;i<pool.length;i++){ acc+=weights[i]; if(r<=acc){ idx=i; break; } }
+  return pool[idx].key;
+}
+
 function localPick(){
+  if(currentPlayer && currentPlayer.achat==='Oui'){
+    const key=pickGuaranteedWin();
+    return GOODIES.findIndex(g=>g.key===key);
+  }
   const cw=computeWeights();
   const pool=[]; let tot=0;
   GOODIES.forEach((g,i)=>{
@@ -848,10 +1026,11 @@ $('logout').addEventListener('click', async ()=>{
   if(tok && !DEMO) { try{ await postJSON({action:'logout', token:tok}); }catch(e){} }
 });
 function updateAnimatorTag(){
-  const tag=$('animator-tag');
-  if(!tag) return;
-  if(auth && auth.label){ tag.innerHTML='Animateur : <b>'+escapeHtml(auth.label)+'</b>'; tag.style.display='block'; }
-  else { tag.textContent=''; tag.style.display='none'; }
+  const html = (auth && auth.label) ? ('Animateur : <b>'+escapeHtml(auth.label)+'</b>') : '';
+  ['animator-tag','animator-tag-d'].forEach(id=>{
+    const tag=$(id); if(!tag) return;
+    tag.innerHTML=html; tag.style.display= html ? 'block' : 'none';
+  });
 }
 
 /* ---- FORM ---- */
@@ -908,16 +1087,35 @@ $('btn-start').addEventListener('click',()=>{
   const player={prenom, nom, telephone:tel, gouvernorat:gov, delegation:del, achat};
   if(playedKeys.has(playerKey(player))) return formError('Ce joueur a déjà participé.');
   currentPlayer=player;
-  $('player-tag').innerHTML='Joueur : <b>'+escapeHtml(prenom+' '+nom)+'</b> · '+escapeHtml(formatTNPhone(tel));
-  $('spin').disabled=false; $('caption').textContent='Tournez pour révéler votre cadeau';
-  showScreen('screen-game');
+  const label='Joueur : <b>'+escapeHtml(prenom+' '+nom)+'</b> · '+escapeHtml(formatTNPhone(tel));
+  $('player-tag').innerHTML=label; $('player-tag-d').innerHTML=label;
+  $('choice-lead').textContent = prenom + ', choisissez votre jeu — les deux ont les mêmes chances de gagner.';
+  showScreen('screen-choice');
+});
+
+/* ---- game choice ---- */
+document.querySelectorAll('#screen-choice .game-tile').forEach(tile=>{
+  tile.addEventListener('click', ()=>{
+    if(tile.dataset.game==='wheel'){
+      $('spin').disabled=false; $('caption').textContent='Tournez pour révéler votre cadeau';
+      showScreen('screen-game'); setBackToChoiceVisible(true);
+    } else {
+      showScreen('screen-dice-intro'); setBackToChoiceVisible(true);
+      ensureDice();   // warm up the 3D scene in the background while they read the legend
+    }
+  });
+});
+$('dice-intro-go').addEventListener('click', ()=>{
+  $('roll').disabled=false; $('dice-caption').textContent='Faites un double pour gagner un cadeau';
+  showScreen('screen-dice'); ensureDice(); setBackToChoiceVisible(true);
+  requestAnimationFrame(()=>requestAnimationFrame(resizeDice));
 });
 
 /* ---- SPIN ---- */
 $('spin').addEventListener('click', async ()=>{
   ac(); if(spinning || !currentPlayer) return;
   if(lastWin>=0){ highlight(lastWin,false); lastWin=-1; }
-  const btn=$('spin'); btn.disabled=true;
+  const btn=$('spin'); btn.disabled=true; setBackToChoiceVisible(false);
 
   if(STOCK){
     /* FAST PATH — decide locally, spin immediately, record in the background */
@@ -967,12 +1165,287 @@ $('spin').addEventListener('click', async ()=>{
 
 /* Landed on a "Perdu" wedge: show the same result modal as a win, but in its
  * lost state — no gift box, no confetti, just an honest "you didn't win". */
+/* ======================================================================
+   DICE GAME — real 3D physics with a predetermined outcome.
+   Odds are IDENTICAL to the wheel: the same computeWeights() decides
+   win vs. Perdu and, if a win, WHICH goodie. We then force the dice to
+   settle on the matching double (1-1 cap, 2-2 tote, 3-3 mug, 4-4 opener,
+   5-5 visor) or on a random non-double for a loss.
+   6-6 is the "Pack complet" jackpot: shown in the legend to entice, but it
+   has 0% chance and is NEVER rolled (it replaces the old dud).
+   ====================================================================== */
+const DOUBLE_TO_KEY = { 1:'cap', 2:'tote', 3:'mug', 4:'opener', 5:'visor' };  // 6 = pack (never wins)
+const KEY_TO_DOUBLE = Object.keys(DOUBLE_TO_KEY).reduce((o,d)=>{o[DOUBLE_TO_KEY[d]]=+d;return o;},{});
+const PACK_DOUBLE = 6;   // the grand-prize face pair — displayed only, never actually rolled
+
+let diceReady=false, dice3D=true;   // dice3D=false → CDN failed, use the simple fallback
+let diceState={ rolling:false, settleTimer:0, plannedIsWin:false, plannedKey:null };
+let diceRAF=null, diceLastT=performance.now();
+let scene3, camera3, renderer3, world3, dice3=[], controls3=null;
+const DIE=1.6, HALF=DIE/2, BOUND=6.2, GRAVITY=-58, TIMESCALE=1.5, FIXED_STEP=1/60;
+const CAM_DEFAULT_POS={x:0,y:12.5,z:9}, CAM_DEFAULT_TARGET={x:0,y:0,z:0};
+let FACES3=null;
+let diceCdnWaited=0;
+
+function ensureDice(){
+  if(diceReady){ if(dice3D){ layoutRest3(); resizeDice(); diceLastT=performance.now(); if(!diceRAF) diceRAF=requestAnimationFrame(diceLoop); } return; }
+  if(typeof THREE==='undefined' || typeof CANNON==='undefined'){
+    diceCdnWaited += 120;
+    if(diceCdnWaited > 4000){ setupDiceFallback(); return; }   // give up on the CDN → 2D fallback
+    setTimeout(ensureDice,120); return;
+  }
+  const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+  FACES3=[ {n:V(1,0,0),v:3},{n:V(-1,0,0),v:4},{n:V(0,1,0),v:1},{n:V(0,-1,0),v:6},{n:V(0,0,1),v:2},{n:V(0,0,-1),v:5} ];
+
+  const canvas=document.getElementById('dice-scene');
+  renderer3=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+  renderer3.setPixelRatio(Math.min(window.devicePixelRatio||1,3));
+  renderer3.shadowMap.enabled=true; renderer3.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer3.outputEncoding=THREE.sRGBEncoding; renderer3.toneMapping=THREE.ACESFilmicToneMapping; renderer3.toneMappingExposure=1.0;
+
+  scene3=new THREE.Scene(); scene3.background=new THREE.Color(0x071a3f); scene3.fog=new THREE.Fog(0x071a3f,20,40);
+  camera3=new THREE.PerspectiveCamera(46,1,0.1,100);
+  camera3.position.set(CAM_DEFAULT_POS.x,CAM_DEFAULT_POS.y,CAM_DEFAULT_POS.z); camera3.lookAt(0,0,0);
+
+  if(typeof THREE.OrbitControls==='function'){
+    controls3=new THREE.OrbitControls(camera3,renderer3.domElement);
+    controls3.target.set(CAM_DEFAULT_TARGET.x,CAM_DEFAULT_TARGET.y,CAM_DEFAULT_TARGET.z);
+    controls3.enableDamping=true; controls3.dampingFactor=0.09;
+    controls3.enablePan=false; controls3.minDistance=5; controls3.maxDistance=24;
+    controls3.minPolarAngle=0.15; controls3.maxPolarAngle=Math.PI/2-0.03;
+    controls3.rotateSpeed=0.6; controls3.zoomSpeed=0.8;
+    controls3.update();
+    const hint=document.getElementById('dice-view-hint');
+    let hintTimer=null;
+    const showHint=()=>{ if(!hint) return; hint.classList.add('show');
+      clearTimeout(hintTimer); hintTimer=setTimeout(()=>hint.classList.remove('show'),2200); };
+    renderer3.domElement.addEventListener('pointerdown',showHint);
+    renderer3.domElement.addEventListener('wheel',showHint,{passive:true});
+    setTimeout(showHint,600);
+    const resetBtn=document.getElementById('dice-reset-view');
+    if(resetBtn) resetBtn.addEventListener('click',()=>{
+      camera3.position.set(CAM_DEFAULT_POS.x,CAM_DEFAULT_POS.y,CAM_DEFAULT_POS.z);
+      controls3.target.set(CAM_DEFAULT_TARGET.x,CAM_DEFAULT_TARGET.y,CAM_DEFAULT_TARGET.z);
+      controls3.update();
+    });
+  }
+
+  scene3.add(new THREE.HemisphereLight(0xdae3ff,0x1a2a55,0.45));
+  const keyL=new THREE.DirectionalLight(0xfff3dd,1.25); keyL.position.set(6,13,5); keyL.castShadow=true;
+  keyL.shadow.mapSize.set(1024,1024); keyL.shadow.camera.near=2; keyL.shadow.camera.far=40;
+  keyL.shadow.camera.left=-12; keyL.shadow.camera.right=12; keyL.shadow.camera.top=12; keyL.shadow.camera.bottom=-12;
+  keyL.shadow.bias=-0.0004; keyL.shadow.radius=3; scene3.add(keyL);
+  const fillL=new THREE.DirectionalLight(0xa0b8ff,0.22); fillL.position.set(-8,6,-4); scene3.add(fillL);
+  const pointL=new THREE.PointLight(0xffcf8a,0.5,40); pointL.position.set(-3,5,-8); scene3.add(pointL);
+
+  function feltTex(){
+    const s=384,c=document.createElement('canvas'); c.width=c.height=s; const g=c.getContext('2d');
+    g.fillStyle='#0f2a5e'; g.fillRect(0,0,s,s);
+    const im=g.getImageData(0,0,s,s),d=im.data;
+    for(let i=0;i<d.length;i+=4){ const n=(Math.random()-0.5)*22; d[i]+=n; d[i+1]+=n; d[i+2]+=n; }
+    g.putImageData(im,0,0);
+    const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(6,6); t.encoding=THREE.sRGBEncoding; return t;
+  }
+  const table=new THREE.Mesh(new THREE.PlaneGeometry(60,60), new THREE.MeshStandardMaterial({map:feltTex(),color:0x18367a,roughness:0.98,metalness:0.0}));
+  table.rotation.x=-Math.PI/2; table.receiveShadow=true; scene3.add(table);
+  const rail=new THREE.Mesh(new THREE.TorusGeometry(BOUND+0.6,0.14,12,64), new THREE.MeshStandardMaterial({color:0xc8a24a,roughness:0.35,metalness:0.85}));
+  rail.rotation.x=-Math.PI/2; rail.position.y=0.02; scene3.add(rail);
+
+  function roundedBox(size,r,seg){
+    const geo=new THREE.BoxGeometry(size,size,size,seg,seg,seg),p=geo.attributes.position,v=new THREE.Vector3();
+    for(let i=0;i<p.count;i++){ v.fromBufferAttribute(p,i); const s=size/2-r;
+      const cx=Math.max(-s,Math.min(s,v.x)),cy=Math.max(-s,Math.min(s,v.y)),cz=Math.max(-s,Math.min(s,v.z));
+      const dx=v.x-cx,dy=v.y-cy,dz=v.z-cz,L=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
+      p.setXYZ(i,cx+dx/L*r,cy+dy/L*r,cz+dz/L*r); }
+    geo.computeVertexNormals(); return geo;
+  }
+  const dieGeo=roundedBox(DIE,DIE*0.14,12);
+  const navyMat=new THREE.MeshPhysicalMaterial({color:0x14306e,roughness:0.35,metalness:0.05,clearcoat:0.6,clearcoatRoughness:0.25});
+  const blackMat=new THREE.MeshPhysicalMaterial({color:0x0b1220,roughness:0.42,metalness:0.05,clearcoat:0.4,clearcoatRoughness:0.35});
+  const pipMat=new THREE.MeshStandardMaterial({color:0xf5f0e4,roughness:0.42,metalness:0.0});
+  const pipGeo=new THREE.SphereGeometry(DIE*0.11,16,12);
+  function pips(v){ const s=0.60; return ({
+    1:[[0,0]],2:[[-s,-s],[s,s]],3:[[-s,-s],[0,0],[s,s]],
+    4:[[-s,-s],[s,-s],[-s,s],[s,s]],5:[[-s,-s],[s,-s],[0,0],[-s,s],[s,s]],
+    6:[[-s,-s],[s,-s],[-s,0],[s,0],[-s,s],[s,s]]})[v]||[]; }
+  function buildDie(mat){
+    const g=new THREE.Group(); const body=new THREE.Mesh(dieGeo,mat); body.castShadow=true; body.receiveShadow=true; g.add(body);
+    const span=HALF-DIE*0.14*0.7, sink=DIE*0.045;
+    FACES3.forEach(f=>{
+      const na=[Math.abs(f.n.x),Math.abs(f.n.y),Math.abs(f.n.z)]; let uA,vA;
+      if(na[1]===1){uA=V(1,0,0);vA=V(0,0,1);} else if(na[0]===1){uA=V(0,0,1);vA=V(0,1,0);} else {uA=V(1,0,0);vA=V(0,1,0);}
+      pips(f.v).forEach(([u,vv])=>{ const pip=new THREE.Mesh(pipGeo,pipMat);
+        const pt=new THREE.Vector3().copy(f.n).multiplyScalar(HALF-sink).addScaledVector(uA,u*span).addScaledVector(vA,vv*span);
+        pip.position.copy(pt); pip.scale.set(1,1,0.6); pip.lookAt(pt.clone().add(f.n)); g.add(pip); });
+    });
+    return g;
+  }
+
+  world3=new CANNON.World(); world3.gravity.set(0,GRAVITY,0); world3.broadphase=new CANNON.NaiveBroadphase();
+  world3.solver.iterations=14; world3.allowSleep=true;
+  const gMat=new CANNON.Material('g'),dMat=new CANNON.Material('d');
+  world3.addContactMaterial(new CANNON.ContactMaterial(gMat,dMat,{friction:0.4,restitution:0.16}));
+  world3.addContactMaterial(new CANNON.ContactMaterial(dMat,dMat,{friction:0.4,restitution:0.16}));
+  const floor=new CANNON.Body({mass:0,material:gMat}); floor.addShape(new CANNON.Plane());
+  floor.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2); world3.addBody(floor);
+  function wall(nx,ny,nz,px,py,pz){ const bb=new CANNON.Body({mass:0,material:gMat}); bb.addShape(new CANNON.Plane());
+    const q=new CANNON.Quaternion(); q.setFromVectors(new CANNON.Vec3(0,0,1),new CANNON.Vec3(nx,ny,nz)); bb.quaternion.copy(q); bb.position.set(px,py,pz); world3.addBody(bb); }
+  wall(1,0,0,-BOUND,0,0); wall(-1,0,0,BOUND,0,0); wall(0,0,1,0,0,-BOUND); wall(0,0,-1,0,0,BOUND);
+
+  const shape=new CANNON.Box(new CANNON.Vec3(HALF,HALF,HALF));
+  [navyMat,blackMat].forEach(mat=>{
+    const mesh=buildDie(mat); scene3.add(mesh);
+    const body=new CANNON.Body({mass:1,material:dMat}); body.addShape(shape);
+    body.linearDamping=0.10; body.angularDamping=0.22; body.sleepSpeedLimit=0.20; body.sleepTimeLimit=0.25;
+    world3.addBody(body); dice3.push({mesh,body});
+  });
+
+  layoutRest3(); resizeDice(); window.addEventListener('resize',resizeDice);
+  if(window.ResizeObserver){
+    const stageEl=document.querySelector('.dice-stage');
+    if(stageEl){ const ro=new ResizeObserver(()=>resizeDice()); ro.observe(stageEl); }
+  }
+  diceReady=true; diceLastT=performance.now(); diceRAF=requestAnimationFrame(diceLoop);
+}
+function resizeDice(){ if(!renderer3) return; const c=renderer3.domElement,w=c.clientWidth,h=c.clientHeight;
+  if(!w||!h) return;
+  const ratio=Math.min(window.devicePixelRatio||1,3);
+  if(renderer3.getPixelRatio()!==ratio) renderer3.setPixelRatio(ratio);
+  renderer3.setSize(w,h,false); camera3.aspect=w/h; camera3.updateProjectionMatrix(); }
+function layoutRest3(){ const n=dice3.length; dice3.forEach((d,i)=>{ d.body.wakeUp();
+  d.body.position.set((i-(n-1)/2)*(DIE*1.5),HALF+0.001,0); d.body.quaternion.set(0,0,0,1);
+  d.body.velocity.setZero(); d.body.angularVelocity.setZero(); d.body.sleep(); syncMesh3(d); }); }
+function syncMesh3(d){ d.mesh.position.copy(d.body.position); d.mesh.quaternion.copy(d.body.quaternion); }
+function readDie3(d){ const q=d.body.quaternion; let best=-Infinity,val=1,wn=new THREE.Vector3();
+  FACES3.forEach(f=>{ wn.copy(f.n).applyQuaternion(q); if(wn.y>best){best=wn.y;val=f.v;} }); return val; }
+function diceAtRest3(){ for(const d of dice3) if(d.body.velocity.norm()>0.16||d.body.angularVelocity.norm()>0.16) return false; return true; }
+function rand3(a,b){ return a+Math.random()*(b-a); }
+function generateInitials3(){ const side=Math.floor(rand3(0,4));
+  return dice3.map((_,i)=>{ let px,pz,vx,vz; const sp=rand3(-2.5,2.5);
+    if(side===0){px=-BOUND+1;pz=sp;vx=rand3(9,15);vz=rand3(-4,4);}
+    else if(side===1){px=BOUND-1;pz=sp;vx=-rand3(9,15);vz=rand3(-4,4);}
+    else if(side===2){pz=-BOUND+1;px=sp;vz=rand3(9,15);vx=rand3(-4,4);}
+    else {pz=BOUND-1;px=sp;vz=-rand3(9,15);vx=rand3(-4,4);}
+    return {px:px+i*0.15,py:rand3(3.2,4.6),pz:pz+i*0.15,ex:rand3(0,6.283),ey:rand3(0,6.283),ez:rand3(0,6.283),
+      vx,vy:rand3(1,3),vz,wx:rand3(-26,26),wy:rand3(-26,26),wz:rand3(-26,26)}; }); }
+function applyInitials3(k){ k.forEach((s,i)=>{ const b=dice3[i].body; b.wakeUp();
+  b.position.set(s.px,s.py,s.pz); b.quaternion.setFromEuler(s.ex,s.ey,s.ez);
+  b.velocity.set(s.vx,s.vy,s.vz); b.angularVelocity.set(s.wx,s.wy,s.wz); }); }
+function simulateSettle3(init){ applyInitials3(init); const MAX=480,MIN=24;
+  for(let s=0;s<MAX;s++){ world3.step(FIXED_STEP); if(s<MIN) continue;
+    let rest=true; for(const d of dice3) if(d.body.velocity.norm()>0.16||d.body.angularVelocity.norm()>0.16){rest=false;break;} if(rest) break; }
+  return dice3.map(readDie3); }
+function findDiceTrajectory(kind,face){
+  const start=performance.now(), BUDGET=900, HARD=2500, TRIES=6000;
+  const ok=f=> kind==='double' ? (f[0]===face&&f[1]===face) : (f[0]!==f[1]);
+  for(let a=0;a<TRIES;a++){ const init=generateInitials3(),f=simulateSettle3(init); if(ok(f)) return {initials:init,faces:f};
+    if((a&7)===0 && performance.now()-start>BUDGET) break; }
+  while(performance.now()-start<HARD){ const init=generateInitials3(),f=simulateSettle3(init); if(ok(f)) return {initials:init,faces:f}; }
+  const init=generateInitials3(); return {initials:init,faces:simulateSettle3(init)};
+}
+/* Same odds engine as the wheel: computeWeights() → win vs Perdu, then which goodie. */
+function pickDiceOutcome(){
+  if(currentPlayer && currentPlayer.achat==='Oui'){
+    return {win:true, key:pickGuaranteedWin()};
+  }
+  if(STOCK){
+    const cw=computeWeights(); const pool=[]; let tot=0;
+    Object.keys(cw.goodie).forEach(k=>{ if(KEY_TO_DOUBLE[k]){ pool.push([k,cw.goodie[k]]); tot+=cw.goodie[k]; } });
+    tot+=cw.perdu; let r=Math.random()*tot,acc=0,picked='perdu';
+    for(const [k,w] of pool){ acc+=w; if(r<=acc){ picked=k; break; } }
+    return picked==='perdu' ? {win:false,key:null} : {win:true,key:picked};
+  }
+  const keys=Object.keys(KEY_TO_DOUBLE);
+  return Math.random()<0.35 ? {win:true,key:keys[Math.floor(Math.random()*keys.length)]} : {win:false,key:null};
+}
+
+/* --- 2D fallback used only if the 3D CDN can't load --- */
+function setupDiceFallback(){
+  dice3D=false; diceReady=true;
+  const stage=document.querySelector('.dice-stage');
+  stage.innerHTML='<div id="dice-fallback"><div class="fdie" id="fdieA"></div><div class="fdie" id="fdieB"></div></div>';
+  if(!document.getElementById('fdie-style')){
+    const st=document.createElement('style'); st.id='fdie-style';
+    st.textContent=`
+      #dice-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8%;}
+      .fdie{width:26%;aspect-ratio:1;border-radius:16%;background:linear-gradient(180deg,#2a4b8f,#12285e);
+        box-shadow:inset 0 -6px 12px rgba(0,0,0,.35),0 10px 22px rgba(0,0,0,.5);
+        display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:12%;gap:6%;}
+      #fdieB{background:linear-gradient(180deg,#1a1a24,#08080e);}
+      .fdie .pip{border-radius:50%;background:#f5f0e4;align-self:center;justify-self:center;width:74%;aspect-ratio:1;visibility:hidden;}
+      .fdie.spin{animation:fspin .6s ease-in-out infinite;}
+      @keyframes fspin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(.9)}100%{transform:rotate(360deg) scale(1)}}
+    `;
+    document.head.appendChild(st);
+  }
+  renderFallbackDie('fdieA',1); renderFallbackDie('fdieB',1);
+}
+const PIP_LAYOUT={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function renderFallbackDie(id,val){
+  const el=document.getElementById(id); if(!el) return;
+  el.innerHTML=''; const on=new Set(PIP_LAYOUT[val]||[]);
+  for(let i=0;i<9;i++){ const p=document.createElement('span'); p.className='pip'; if(on.has(i)) p.style.visibility='visible'; el.appendChild(p); }
+}
+function rollFallback(faceA,faceB){
+  const A=document.getElementById('fdieA'),B=document.getElementById('fdieB');
+  A.classList.add('spin'); B.classList.add('spin');
+  let t=0; const iv=setInterval(()=>{ renderFallbackDie('fdieA',1+Math.floor(Math.random()*6)); renderFallbackDie('fdieB',1+Math.floor(Math.random()*6)); t+=90; }, 90);
+  setTimeout(()=>{ clearInterval(iv); A.classList.remove('spin'); B.classList.remove('spin');
+    renderFallbackDie('fdieA',faceA); renderFallbackDie('fdieB',faceB); finishDiceRoll(); }, 1600);
+}
+
+$('roll').addEventListener('click', ()=>{
+  ac(); if(!diceReady || diceState.rolling || !currentPlayer) return;
+  $('roll').disabled=true; $('dice-caption').textContent='Les dés roulent…'; setBackToChoiceVisible(false);
+  const outcome=pickDiceOutcome();
+  diceState.rolling=true; diceState.settleTimer=0; diceState.plannedIsWin=outcome.win; diceState.plannedKey=outcome.key;
+  // save immediately — the animation just confirms the already-decided result
+  playedKeys.add(playerKey(currentPlayer));
+  if(outcome.win && STOCK && STOCK[outcome.key]){ const s=STOCK[outcome.key]; s.remaining=Math.max(0,s.remaining-1); s.budgetLeft=Math.max(0,s.budgetLeft-1); }
+  if(!offlineMode()) queueRecord({player:currentPlayer, key: outcome.win?outcome.key:PERDU_KEY, token: auth && auth.token});
+
+  if(dice3D){
+    const target = outcome.win ? findDiceTrajectory('double',KEY_TO_DOUBLE[outcome.key]) : findDiceTrajectory('nondouble');
+    applyInitials3(target.initials);
+  } else {
+    // fallback: just show the intended faces
+    let a,bb;
+    if(outcome.win){ a=bb=KEY_TO_DOUBLE[outcome.key]; }
+    else { a=1+Math.floor(Math.random()*6); do{ bb=1+Math.floor(Math.random()*6); }while(bb===a); }
+    rollFallback(a,bb);
+  }
+});
+function finishDiceRoll(){
+  if(!diceState.rolling) return;
+  diceState.rolling=false; $('roll').disabled=true;
+  if(diceState.plannedIsWin){
+    const idx=GOODIES.findIndex(g=>g.key===diceState.plannedKey);
+    $('dice-caption').textContent='Félicitations ! Vous avez fait un double.';
+    setTimeout(()=>reveal(idx),400);
+  } else {
+    $('dice-caption').textContent='Pas de double cette fois-ci.';
+    setTimeout(()=>loseReveal(GOODIES.findIndex(g=>g.empty)),500);
+  }
+}
+function diceLoop(){
+  diceRAF=requestAnimationFrame(diceLoop);
+  if(!renderer3) return;
+  const now=performance.now(), dt=Math.min((now-diceLastT)/1000,0.05); diceLastT=now;
+  if(!document.getElementById('screen-dice').classList.contains('on')) return;
+  world3.step(FIXED_STEP,dt*TIMESCALE,6); dice3.forEach(syncMesh3);
+  if(diceState.rolling){ if(diceAtRest3()){ diceState.settleTimer+=dt; if(diceState.settleTimer>0.15) finishDiceRoll(); } else diceState.settleTimer=0; }
+  if(controls3) controls3.update();
+  renderer3.render(scene3,camera3);
+}
+
 function loseReveal(index){
   highlight(index,true);
   const prize=$('prize');
   prize.classList.remove('revealed');
   prize.classList.add('lost');
   $('won-text').textContent='Pas de chance';
+  const lostFaces=['🤕','😔','😭','😓'];
+  $('lost-face').textContent=lostFaces[Math.floor(Math.random()*lostFaces.length)];
   $('lost-msg').textContent=(currentPlayer ? currentPlayer.prenom+', vous' : 'Vous')+' n\'avez malheureusement rien gagné cette fois.';
   $('result').classList.add('show');
   S.tick();
@@ -982,7 +1455,9 @@ function loseReveal(index){
 /* result → new player */
 $('again').addEventListener('click',()=>{
   $('result').classList.remove('show');
-  currentPlayer=null; resetForm(); refreshStock(); showScreen('screen-form');
+  currentPlayer=null;
+  if(diceReady && dice3D) layoutRest3();
+  resetForm(); refreshStock(); showScreen('screen-form');
 });
 
 /* ---- mute ---- */
@@ -991,17 +1466,57 @@ $('mute').addEventListener('click',()=>{
   $('mute').setAttribute('aria-label',muted?'Activer le son':'Couper le son');
 });
 
+/* ---- dice legend (double → gift), built from the mapping so it can't drift ---- */
+function miniDie(face, dark){
+  // 3x3 grid; which cells get a pip for each face value
+  const P={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[face]||[];
+  let cells=''; for(let i=0;i<9;i++){ cells+='<span class="mp" style="visibility:'+(P.indexOf(i)>=0?'visible':'hidden')+'"></span>'; }
+  return '<span class="mini-die'+(dark?' dark':'')+'">'+cells+'</span>';
+}
+function goodieByKey(k){ return GOODIES.find(g=>g.key===k) || {name:k, sub:''}; }
+function buildDiceLegend(){
+  const host=$('dice-legend'); if(!host) return;
+  // real doubles 1..5 in face order, then the jackpot (6) last
+  const order=[1,2,3,4,5];
+  let html='';
+  order.forEach(face=>{
+    const g=goodieByKey(DOUBLE_TO_KEY[face]);
+    html+='<div class="legend-row">'
+      + '<div class="legend-dice">'+miniDie(face,false)+miniDie(face,true)+'</div>'
+      + '<div class="legend-arrow">→</div>'
+      + '<div class="legend-gift"><span class="lg-icon"><svg viewBox="0 0 120 120"><use href="#ic-'+DOUBLE_TO_KEY[face]+'"/></svg></span>'
+      + '<span class="lg-name">'+g.name+'</span></div>'
+      + '</div>';
+  });
+  // jackpot row: double 6 → pack of everything
+  const packIcons=['tote','cap','mug','visor','opener'].map(k=>'<svg viewBox="0 0 120 120"><use href="#ic-'+k+'"/></svg>').join('');
+  html+='<div class="legend-row jackpot">'
+    + '<div class="legend-dice">'+miniDie(6,false)+miniDie(6,true)+'</div>'
+    + '<div class="legend-arrow">→</div>'
+    + '<div class="legend-gift"><span class="lg-name">Pack complet <span class="lg-badge">Jackpot</span></span>'
+    + '<span class="lg-pack">'+packIcons+'</span></div>'
+    + '</div>';
+  host.innerHTML=html;
+}
+
 /* ---- init ---- */
 buildWheel();
+buildDiceLegend();
 fillGovernorates();
 updateSyncBadge();
 flushPending();            // resend anything left over from a previous session
 
 (async ()=>{
-  if(auth && (DEMO || auth.token)){
-    // resume session (token might have expired — apiCall will bounce us back to login if so)
-    const ok = await loadInit();
+  // Only auto-resume a real, backend-confirmed session (not DEMO, must have a token).
+  // If the backend can't confirm it (expired token, offline, opened via file://),
+  // clear the stale session and require a fresh login with password.
+  if(auth && !DEMO && auth.token){
+    const ok = await loadInit();          // hits the backend; true only if it accepted our token
     if(ok){ updateAnimatorTag(); resetForm(); showScreen('screen-form'); return; }
+    auth=null; saveAuth(null); updateAnimatorTag();
+  } else if(auth && DEMO){
+    // demo mode has no backend to confirm against — don't silently resume
+    auth=null; saveAuth(null);
   }
   showScreen('screen-login');
 })();
